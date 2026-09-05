@@ -1,0 +1,56 @@
+{
+  "classes": [
+    "foot_mouth_disease",
+    "healthy",
+    "lumpy_skin_disease",
+    "mastitis",
+    "skin_disease"
+  ],
+  "num_classes": 5,
+  "class_to_index": {
+    "foot_mouth_disease": 0,
+    "healthy": 1,
+    "lumpy_skin_disease": 2,
+    "mastitis": 3,
+    "skin_disease": 4
+  },
+  "index_to_class": {
+    "0": "foot_mouth_disease",
+    "1": "healthy",
+    "2": "lumpy_skin_disease",
+    "3": "mastitis",
+    "4": "skin_disease"
+  },
+  "img_size": [
+    224,
+    224
+  ],
+  "splits": {
+    "foot_mouth_disease": {
+      "train": 630,
+      "val": 180,
+      "test": 90
+    },
+    "healthy": {
+      "train": 630,
+      "val": 180,
+      "test": 90
+    },
+    "lumpy_skin_disease": {
+      "train": 630,
+      "val": 180,
+      "test": 90
+    },
+    "mastitis": {
+      "train": 118,
+      "val": 34,
+      "test": 18
+    },
+    "skin_disease": {
+      "train": 77,
+      "val": 22,
+      "test": 11
+    }
+  },
+  "model_version": "1.0"
+}

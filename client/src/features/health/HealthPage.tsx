@@ -592,80 +592,185 @@ const HealthPage = () => {
             </div>
           </div>
 
-          {/* Compliance Metrics Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-            <div className="card" style={{ padding: '18px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <strong style={{ fontSize: '0.875rem', color: 'var(--text-primary)' }}>FMD Bi-Annual Vaccine</strong>
-                <span className="badge badge-success">Round 8 Complete</span>
+          {/* Compliance Metrics Grid with SVG Circular Progress Rings */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+            
+            {/* Card 1: FMD Bi-Annual Vaccine */}
+            <div className="card" style={{ padding: '20px', borderTop: '3px solid #10B981', background: 'var(--bg-card)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                <strong style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)' }}>FMD Bi-Annual Vaccine</strong>
+                <span className="badge badge-success" style={{ fontSize: '0.72rem', padding: '4px 10px' }}>Round 8 Complete</span>
               </div>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                Mandatory oil-adjuvant vaccine protecting against FMD virus strains O, A, and Asia-1.
-              </p>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '4px' }}>
-                <span style={{ color: 'var(--text-secondary)' }}>Coverage:</span>
-                <strong style={{ color: '#10B981' }}>48 / 48 Cattle (100%)</strong>
-              </div>
-              <div className="progress-bar" style={{ marginBottom: '10px' }}><div className="progress-fill" style={{ width: '100%', background: '#10B981' }} /></div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                Next Booster Due: <strong>15 October 2026</strong> • Batch: <strong>ROV-8941</strong>
-              </div>
-            </div>
-
-            <div className="card" style={{ padding: '18px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <strong style={{ fontSize: '0.875rem', color: 'var(--text-primary)' }}>LSD Homologous Vaccine</strong>
-                <span className="badge badge-info">Ring Protection</span>
-              </div>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                Goat Pox / Lumpi-ProVacInd homologous vaccine preventing cutaneous nodules.
-              </p>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '4px' }}>
-                <span style={{ color: 'var(--text-secondary)' }}>Coverage:</span>
-                <strong style={{ color: '#0EA5E9' }}>46 / 48 Cattle (96%)</strong>
-              </div>
-              <div className="progress-bar" style={{ marginBottom: '10px' }}><div className="progress-fill" style={{ width: '96%', background: '#0EA5E9' }} /></div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                Active Quarantined Cases: <strong style={{ color: '#10B981' }}>0 (Clean Shelter Zone)</strong>
-              </div>
-            </div>
-
-            <div className="card" style={{ padding: '18px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <strong style={{ fontSize: '0.875rem', color: 'var(--text-primary)' }}>Brucellosis Calfhood Program</strong>
-                <span className="badge badge-purple">Cotton Strain 19</span>
-              </div>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                One-time lifetime vaccination for female calves aged 4 to 8 months.
-              </p>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '4px' }}>
-                <span style={{ color: 'var(--text-secondary)' }}>Eligible Calves Protected:</span>
-                <strong style={{ color: '#8B5CF6' }}>100% Calves Vaccinated</strong>
-              </div>
-              <div className="progress-bar" style={{ marginBottom: '10px' }}><div className="progress-fill" style={{ width: '100%', background: '#8B5CF6' }} /></div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                Cold Chain Storage: <strong style={{ color: '#10B981' }}>4.2°C (IoT Monitored)</strong>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                {/* Circular Gauge */}
+                <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="72" height="72" viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)' }}>
+                    <circle cx="36" cy="36" r="28" fill="none" stroke="var(--border-color)" strokeWidth="6" opacity="0.35" />
+                    <circle
+                      cx="36"
+                      cy="36"
+                      r="28"
+                      fill="none"
+                      stroke="#10B981"
+                      strokeWidth="6"
+                      strokeDasharray={175.9}
+                      strokeDashoffset={0}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', lineHeight: 1 }}>
+                    <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#10B981' }}>100%</span>
+                    <span style={{ fontSize: '0.56rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '2px' }}>DONE</span>
+                  </div>
+                </div>
+                {/* Details */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0 0 8px', lineHeight: 1.35 }}>
+                    Mandatory oil-adjuvant vaccine protecting against FMD virus strains O, A, and Asia-1.
+                  </p>
+                  <div style={{ fontSize: '0.78rem', marginBottom: '4px' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Coverage: </span>
+                    <strong style={{ color: '#10B981' }}>48 / 48 Cattle (100%)</strong>
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                    Next Booster: <strong>15 Oct 2026</strong> • Batch: <strong>ROV-8941</strong>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* RGM Card */}
-            <div className="card" style={{ padding: '18px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <strong style={{ fontSize: '0.875rem', color: 'var(--text-primary)' }}>Rashtriya Gokul Mission (RGM)</strong>
-                <span className="badge badge-warning">Indigenous Breeds</span>
+            {/* Card 2: LSD Homologous Vaccine */}
+            <div className="card" style={{ padding: '20px', borderTop: '3px solid #0EA5E9', background: 'var(--bg-card)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                <strong style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)' }}>LSD Homologous Vaccine</strong>
+                <span className="badge badge-info" style={{ fontSize: '0.72rem', padding: '4px 10px' }}>Ring Protection</span>
               </div>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                Pedigree Artificial Insemination & indigenous breed genetic improvement program.
-              </p>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '4px' }}>
-                <span style={{ color: 'var(--text-secondary)' }}>Herd Indigenous Purity:</span>
-                <strong style={{ color: '#F59E0B' }}>44 / 48 Cattle (92%)</strong>
-              </div>
-              <div className="progress-bar" style={{ marginBottom: '10px' }}><div className="progress-fill" style={{ width: '92%', background: '#F59E0B' }} /></div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                Certified Semen Source: <strong style={{ color: '#10B981' }}>NDDB / CFSP&TI Station</strong>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                {/* Circular Gauge */}
+                <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="72" height="72" viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)' }}>
+                    <circle cx="36" cy="36" r="28" fill="none" stroke="var(--border-color)" strokeWidth="6" opacity="0.35" />
+                    <circle
+                      cx="36"
+                      cy="36"
+                      r="28"
+                      fill="none"
+                      stroke="#0EA5E9"
+                      strokeWidth="6"
+                      strokeDasharray={175.9}
+                      strokeDashoffset={7.03}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', lineHeight: 1 }}>
+                    <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0EA5E9' }}>96%</span>
+                    <span style={{ fontSize: '0.56rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '2px' }}>SAFE</span>
+                  </div>
+                </div>
+                {/* Details */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0 0 8px', lineHeight: 1.35 }}>
+                    Goat Pox / Lumpi-ProVacInd homologous vaccine preventing cutaneous nodules.
+                  </p>
+                  <div style={{ fontSize: '0.78rem', marginBottom: '4px' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Coverage: </span>
+                    <strong style={{ color: '#0EA5E9' }}>46 / 48 Cattle (96%)</strong>
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                    Active Quarantined Cases: <strong style={{ color: '#10B981' }}>0 (Clean Zone)</strong>
+                  </div>
+                </div>
               </div>
             </div>
+
+            {/* Card 3: Brucellosis Calfhood Program */}
+            <div className="card" style={{ padding: '20px', borderTop: '3px solid #8B5CF6', background: 'var(--bg-card)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                <strong style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)' }}>Brucellosis Calfhood Program</strong>
+                <span className="badge badge-purple" style={{ fontSize: '0.72rem', padding: '4px 10px' }}>Cotton Strain 19</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                {/* Circular Gauge */}
+                <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="72" height="72" viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)' }}>
+                    <circle cx="36" cy="36" r="28" fill="none" stroke="var(--border-color)" strokeWidth="6" opacity="0.35" />
+                    <circle
+                      cx="36"
+                      cy="36"
+                      r="28"
+                      fill="none"
+                      stroke="#8B5CF6"
+                      strokeWidth="6"
+                      strokeDasharray={175.9}
+                      strokeDashoffset={0}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', lineHeight: 1 }}>
+                    <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#8B5CF6' }}>100%</span>
+                    <span style={{ fontSize: '0.56rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '2px' }}>CALVES</span>
+                  </div>
+                </div>
+                {/* Details */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0 0 8px', lineHeight: 1.35 }}>
+                    One-time lifetime vaccination for female calves aged 4 to 8 months.
+                  </p>
+                  <div style={{ fontSize: '0.78rem', marginBottom: '4px' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Eligible Calves: </span>
+                    <strong style={{ color: '#8B5CF6' }}>100% Vaccinated</strong>
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                    Cold Storage: <strong style={{ color: '#10B981' }}>4.2°C (IoT Monitored)</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 4: Rashtriya Gokul Mission (RGM) */}
+            <div className="card" style={{ padding: '20px', borderTop: '3px solid #F59E0B', background: 'var(--bg-card)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                <strong style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)' }}>Rashtriya Gokul Mission (RGM)</strong>
+                <span className="badge badge-warning" style={{ fontSize: '0.72rem', padding: '4px 10px' }}>Indigenous Breeds</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                {/* Circular Gauge */}
+                <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="72" height="72" viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)' }}>
+                    <circle cx="36" cy="36" r="28" fill="none" stroke="var(--border-color)" strokeWidth="6" opacity="0.35" />
+                    <circle
+                      cx="36"
+                      cy="36"
+                      r="28"
+                      fill="none"
+                      stroke="#F59E0B"
+                      strokeWidth="6"
+                      strokeDasharray={175.9}
+                      strokeDashoffset={14.07}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', lineHeight: 1 }}>
+                    <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#F59E0B' }}>92%</span>
+                    <span style={{ fontSize: '0.56rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '2px' }}>PURE</span>
+                  </div>
+                </div>
+                {/* Details */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0 0 8px', lineHeight: 1.35 }}>
+                    Pedigree Artificial Insemination & indigenous breed genetic improvement program.
+                  </p>
+                  <div style={{ fontSize: '0.78rem', marginBottom: '4px' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Indigenous Purity: </span>
+                    <strong style={{ color: '#F59E0B' }}>44 / 48 Cattle (92%)</strong>
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                    Semen Source: <strong style={{ color: '#10B981' }}>NDDB / CFSP&TI Station</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       ) : null}
