@@ -6,7 +6,7 @@ import {
   LogOut, Bell, Globe, UserCog, AlertTriangle,
   Syringe, CheckCircle2, Activity, ArrowRight,
   Calendar, Layers, Sun, Moon, Home, ChevronRight as BreadcrumbArrow,
-  Factory
+  Factory, Map, Ambulance, MapPin
 } from 'lucide-react';
 import { CowIcon } from '../common/CowIcon';
 import { useAuthStore } from '../../store/authStore';
@@ -34,6 +34,8 @@ const NAV_CONFIG = [
   { path: '/dashboard/visitors', icon: Users, key: 'nav.visitors' as const, badge: null, color: '#F59E0B' },
   { path: '/dashboard/finance', icon: WalletCards, key: 'nav.finance' as const, badge: null, color: '#06B6D4' },
   { path: '/dashboard/ai', icon: Sparkles, key: 'nav.ai' as const, badge: 'AI', color: '#A855F7' },
+  { path: '/dashboard/rescue-map', icon: Ambulance, key: 'nav.rescueMap' as const, badge: 'LIVE', color: '#EF4444' },
+  { path: '/dashboard/national-map', icon: Map, key: 'nav.nationalMap' as const, badge: 'NEW', color: '#7C3AED' },
 ];
 
 const ROLE_ALLOWED_PATHS: Record<string, string[]> = {
@@ -47,7 +49,9 @@ const ROLE_ALLOWED_PATHS: Record<string, string[]> = {
     '/dashboard/visitors',
     '/dashboard/finance',
     '/dashboard/ai',
+    '/dashboard/rescue-map',
     '/dashboard/users',
+    '/dashboard/national-map',
   ],
   veterinarian: [
     '/dashboard',
@@ -56,6 +60,8 @@ const ROLE_ALLOWED_PATHS: Record<string, string[]> = {
     '/dashboard/ai',
     '/dashboard/operations',
     '/dashboard/gobar-dhan',
+    '/dashboard/rescue-map',
+    '/dashboard/national-map',
   ],
   caretaker: [
     '/dashboard',
@@ -82,6 +88,7 @@ const ROLE_ALLOWED_PATHS: Record<string, string[]> = {
     '/dashboard/health',
     '/dashboard/gobar-dhan',
     '/dashboard/finance',
+    '/dashboard/national-map',
   ],
 };
 

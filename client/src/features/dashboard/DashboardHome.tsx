@@ -18,6 +18,7 @@ import {
 import { CowIcon } from '../../components/common/CowIcon';
 import VaccinationDueWidget from './VaccinationDueWidget';
 import AIWeeklyInsightsWidget from './AIWeeklyInsightsWidget';
+import RescueMapView from '../cows/RescueMapView';
 
 const DashboardHome = () => {
   const { user } = useAuthStore();
@@ -35,6 +36,8 @@ const DashboardHome = () => {
   const [urgentTasks, setUrgentTasks]     = useState<any[]>([]);
   const [sosDismissed, setSosDismissed]   = useState(false);
   const [pendingRescueAlerts, setPendingRescueAlerts] = useState<any[]>([]);
+  const [showRescueMapModal, setShowRescueMapModal]   = useState(false);
+  const [selectedRescueId, setSelectedRescueId]       = useState<string | null>(null);
   const [subsidyState, setSubsidyState]   = useState<'up' | 'rj' | 'gj' | 'mp' | 'hr'>('up');
   const [subsidyCattleCount, setSubsidyCattleCount] = useState(48);
 
@@ -395,7 +398,10 @@ const DashboardHome = () => {
               <button
                 className="btn"
                 style={{ background: 'rgba(255,255,255,0.18)', color: 'white', border: '1px solid rgba(255,255,255,0.35)', fontSize: '0.8rem', padding: '7px 14px' }}
-                onClick={() => navigate('/rescue')}
+                onClick={() => {
+                  setSelectedRescueId(pendingRescueAlerts[0]?.id || null);
+                  setShowRescueMapModal(true);
+                }}
               >
                 <MapPin size={14} /> {language === 'hi' ? 'रेस्क्यू मैप खोलें' : 'View on Rescue Map'}
               </button>
@@ -1009,6 +1015,15 @@ const DashboardHome = () => {
           {t('card.openAiSuite', 'Open AI Suite')} <Sparkles size={15} />
         </button>
       </div>
+
+      {/* Live Rescue Map Modal triggered from Alert */}
+      {showRescueMapModal && (
+        <RescueMapView
+          isModal={true}
+          initialSelectedId={selectedRescueId || undefined}
+          onClose={() => setShowRescueMapModal(false)}
+        />
+      )}
     </div>
   );
 };

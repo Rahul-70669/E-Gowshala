@@ -22,6 +22,8 @@ import PublicImpactPage from './features/impact/PublicImpactPage';
 import AdoptPhotoWallPage from './features/impact/AdoptPhotoWallPage';
 import PublicHomePage from './features/home/PublicHomePage';
 import RescueCowPage from './features/cows/RescueCowPage';
+import NationalGaushalaMap from './features/home/NationalGaushalaMap';
+import RescueMapView from './features/cows/RescueMapView';
 
 // Protected route wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -52,6 +54,7 @@ function App() {
         <Route path="/adopt-wall" element={<AdoptPhotoWallPage />} />
         <Route path="/adopt" element={<AdoptPhotoWallPage />} />
         <Route path="/rescue" element={<RescueCowPage />} />
+        <Route path="/national-map" element={<NationalGaushalaMap />} />
 
         {/* Protected Dashboard Routes */}
         <Route
@@ -75,10 +78,13 @@ function App() {
           <Route path="ai" element={<AIDashboardPage />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="rescue" element={<RescueCowPage />} />
+          <Route path="rescue-map" element={<RescueMapView />} />
+          <Route path="national-map" element={<NationalGaushalaMap />} />
         </Route>
 
         {/* Public Landing Homepage */}
         <Route path="/" element={<PublicHomePage />} />
+        <Route path="/rescue-map" element={<RescueMapView />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
