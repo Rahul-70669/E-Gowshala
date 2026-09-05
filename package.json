@@ -1,0 +1,18 @@
+{
+  "name": "e-gowshala-root",
+  "version": "1.0.0",
+  "description": "Smart Gaushala Management System",
+  "private": true,
+  "scripts": {
+    "start": "concurrently -n \"SERVER,CLIENT,AI\" -c \"blue,green,magenta\" \"npm run dev --prefix server\" \"npm run dev --prefix client\" \"python -m uvicorn main:app --app-dir ai-service --port 8000\"",
+    "dev": "npm run start",
+    "server": "npm run dev --prefix server",
+    "client": "npm run dev --prefix client",
+    "ai": "python -m uvicorn main:app --app-dir ai-service --port 8000",
+    "build:client": "npm run build --prefix client",
+    "build:server": "npm run build --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
