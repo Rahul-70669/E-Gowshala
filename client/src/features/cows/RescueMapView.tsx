@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { MapPin, ShieldCheck, Heart, AlertTriangle, Sparkles, X, Activity, Calendar, Compass, Navigation } from 'lucide-react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { MapPin, ShieldCheck, Heart, AlertTriangle, Sparkles, X, Activity, Calendar, Compass, Navigation, ArrowLeft } from 'lucide-react';
 import { CowIcon } from '../../components/common/CowIcon';
 import { useThemeStore } from '../../store/themeStore';
 
@@ -144,6 +145,9 @@ export const RescueMapView = ({
   onClose?: () => void;
   initialSelectedId?: string;
 }) => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const activeSelectedId = initialSelectedId || searchParams.get('selectedId');
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
   const [missions, setMissions] = useState<RescueMission[]>(FALLBACK_MISSIONS);
@@ -158,8 +162,8 @@ export const RescueMapView = ({
         if (res.data?.locations?.length) {
           const locs = res.data.locations;
           setMissions(locs);
-          if (initialSelectedId) {
-            const found = locs.find((l: any) => l.id === initialSelectedId);
+          if (activeSelectedId) {
+            const found = locs.find((l: any) => l.id === activeSelectedId);
             if (found) {
               setSelected(found);
               return;
@@ -184,11 +188,11 @@ export const RescueMapView = ({
   }, []);
 
   useEffect(() => {
-    if (initialSelectedId && missions.length > 0) {
-      const found = missions.find((m: any) => m.id === initialSelectedId);
+    if (activeSelectedId && missions.length > 0) {
+      const found = missions.find((m: any) => m.id === activeSelectedId);
       if (found) setSelected(found);
     }
-  }, [initialSelectedId, missions]);
+  }, [activeSelectedId, missions]);
 
   const handleDispatchAction = async (missionId: string) => {
     try {
@@ -226,6 +230,15 @@ export const RescueMapView = ({
           </h2>
         </div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {!isModal && (
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="btn btn-secondary"
+              style={{ padding: '6px 12px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              <ArrowLeft size={14} /> Back to Dashboard
+            </button>
+          )}
           <button
             onClick={fetchMissions}
             disabled={refreshing}

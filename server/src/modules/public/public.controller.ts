@@ -364,6 +364,32 @@ export const INDIAN_CITY_COORDS: Record<string, { lat: number; lng: number }> = 
   bangalore: { lat: 12.9716, lng: 77.5946 },
   chennai: { lat: 13.0827, lng: 80.2707 },
   guwahati: { lat: 26.1445, lng: 91.7362 },
+  // Kerala & Southern Regions
+  kerala: { lat: 10.8505, lng: 76.2711 },
+  kochi: { lat: 9.9312, lng: 76.2673 },
+  cochin: { lat: 9.9312, lng: 76.2673 },
+  thiruvananthapuram: { lat: 8.5241, lng: 76.9366 },
+  trivandrum: { lat: 8.5241, lng: 76.9366 },
+  kozhikode: { lat: 11.2588, lng: 75.7804 },
+  calicut: { lat: 11.2588, lng: 75.7804 },
+  thrissur: { lat: 10.5276, lng: 76.2144 },
+  malappuram: { lat: 11.0732, lng: 76.0740 },
+  kannur: { lat: 11.8745, lng: 75.3704 },
+  kollam: { lat: 8.8932, lng: 76.6141 },
+  alappuzha: { lat: 9.4981, lng: 76.3388 },
+  alleppey: { lat: 9.4981, lng: 76.3388 },
+  palakkad: { lat: 10.7867, lng: 76.6548 },
+  kottayam: { lat: 9.5916, lng: 76.5222 },
+  kasaragod: { lat: 12.5102, lng: 74.9852 },
+  wayanad: { lat: 11.6854, lng: 76.1320 },
+  idukki: { lat: 9.8494, lng: 76.9804 },
+  pathanamthitta: { lat: 9.2648, lng: 76.7870 },
+  coimbatore: { lat: 11.0168, lng: 76.9558 },
+  madurai: { lat: 9.9252, lng: 78.1198 },
+  mysore: { lat: 12.2958, lng: 76.6394 },
+  mysuru: { lat: 12.2958, lng: 76.6394 },
+  goa: { lat: 15.2993, lng: 74.1240 },
+  panaji: { lat: 15.4909, lng: 73.8278 },
 };
 
 export function resolveIndianCoords(locationName?: string, lat?: number | null, lng?: number | null): { lat: number; lng: number } {
@@ -544,9 +570,10 @@ export const getRescueLocations = async (_req: Request, res: Response): Promise<
       const coords = resolveIndianCoords(rep.locationName, rep.latitude, rep.longitude);
       const lat = coords.lat;
       const lng = coords.lng;
-      // Calibrated Indian SVG projection (viewBox 500x560)
-      const xPct = Math.max(12, Math.min(88, Math.round(24 + (lng - 70) * 2.8)));
-      const yPct = Math.max(12, Math.min(88, Math.round(15 + (32 - lat) * 2.9)));
+      // Calibrated Indian SVG projection (viewBox 500x560, lat range: 8 to 35, lng range: 68 to 92)
+      // Kerala: lat ~ 8-12, lng ~ 75-77 -> xPct ~ 40-44%, yPct ~ 82-87%
+      const xPct = Math.max(12, Math.min(88, Math.round(18 + ((lng - 68) / (92 - 68)) * 68)));
+      const yPct = Math.max(10, Math.min(90, Math.round(12 + ((35 - lat) / (35 - 8)) * 76)));
 
       return {
         id: rep.id,

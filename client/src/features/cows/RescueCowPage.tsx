@@ -77,6 +77,32 @@ const INDIAN_CITY_COORDS: Record<string, { lat: number; lng: number; state: stri
   'bangalore': { lat: 12.9716, lng: 77.5946, state: 'Karnataka', city: 'Bengaluru' },
   'chennai': { lat: 13.0827, lng: 80.2707, state: 'Tamil Nadu', city: 'Chennai' },
   'guwahati': { lat: 26.1445, lng: 91.7362, state: 'Assam', city: 'Guwahati' },
+  // Kerala & Southern Regions
+  'kerala': { lat: 10.8505, lng: 76.2711, state: 'Kerala', city: 'Kerala' },
+  'kochi': { lat: 9.9312, lng: 76.2673, state: 'Kerala', city: 'Kochi' },
+  'cochin': { lat: 9.9312, lng: 76.2673, state: 'Kerala', city: 'Kochi' },
+  'thiruvananthapuram': { lat: 8.5241, lng: 76.9366, state: 'Kerala', city: 'Thiruvananthapuram' },
+  'trivandrum': { lat: 8.5241, lng: 76.9366, state: 'Kerala', city: 'Thiruvananthapuram' },
+  'kozhikode': { lat: 11.2588, lng: 75.7804, state: 'Kerala', city: 'Kozhikode' },
+  'calicut': { lat: 11.2588, lng: 75.7804, state: 'Kerala', city: 'Kozhikode' },
+  'thrissur': { lat: 10.5276, lng: 76.2144, state: 'Kerala', city: 'Thrissur' },
+  'malappuram': { lat: 11.0732, lng: 76.0740, state: 'Kerala', city: 'Malappuram' },
+  'kannur': { lat: 11.8745, lng: 75.3704, state: 'Kerala', city: 'Kannur' },
+  'kollam': { lat: 8.8932, lng: 76.6141, state: 'Kerala', city: 'Kollam' },
+  'alappuzha': { lat: 9.4981, lng: 76.3388, state: 'Kerala', city: 'Alappuzha' },
+  'alleppey': { lat: 9.4981, lng: 76.3388, state: 'Kerala', city: 'Alappuzha' },
+  'palakkad': { lat: 10.7867, lng: 76.6548, state: 'Kerala', city: 'Palakkad' },
+  'kottayam': { lat: 9.5916, lng: 76.5222, state: 'Kerala', city: 'Kottayam' },
+  'kasaragod': { lat: 12.5102, lng: 74.9852, state: 'Kerala', city: 'Kasaragod' },
+  'wayanad': { lat: 11.6854, lng: 76.1320, state: 'Kerala', city: 'Wayanad' },
+  'idukki': { lat: 9.8494, lng: 76.9804, state: 'Kerala', city: 'Idukki' },
+  'pathanamthitta': { lat: 9.2648, lng: 76.7870, state: 'Kerala', city: 'Pathanamthitta' },
+  'coimbatore': { lat: 11.0168, lng: 76.9558, state: 'Tamil Nadu', city: 'Coimbatore' },
+  'madurai': { lat: 9.9252, lng: 78.1198, state: 'Tamil Nadu', city: 'Madurai' },
+  'mysore': { lat: 12.2958, lng: 76.6394, state: 'Karnataka', city: 'Mysuru' },
+  'mysuru': { lat: 12.2958, lng: 76.6394, state: 'Karnataka', city: 'Mysuru' },
+  'goa': { lat: 15.2993, lng: 74.1240, state: 'Goa', city: 'Goa' },
+  'panaji': { lat: 15.4909, lng: 73.8278, state: 'Goa', city: 'Panaji' },
 };
 
 function resolveCityFromLocation(text: string): { lat: number; lng: number; label: string } | null {
@@ -366,7 +392,7 @@ const RescueCowPage = () => {
                   <button
                     className="btn btn-primary"
                     style={{ background: 'linear-gradient(135deg, #EF4444, #DC2626)', border: 'none', display: 'flex', alignItems: 'center', gap: 6 }}
-                    onClick={() => setShowMapModal(true)}
+                    onClick={() => navigate(submittedReport?.id ? `/dashboard/rescue-map?selectedId=${submittedReport.id}` : '/dashboard/rescue-map')}
                   >
                     <MapPin size={16} /> {language === 'hi' ? '📍 लाइव रेस्क्यू मैप पर देखें' : '📍 View on Live Rescue Map'}
                   </button>
@@ -482,6 +508,7 @@ const RescueCowPage = () => {
                         {[
                           { label: '📍 Jaipur NH-48', lat: 26.9124, lng: 75.7873, name: 'Jaipur Bypass NH-48, Milestone 14' },
                           { label: '📍 Mathura Pilgrim Marg', lat: 27.4924, lng: 77.6737, name: 'Gau Ghat, Yamuna Marg, Mathura' },
+                          { label: '📍 Kochi, Kerala NH-66', lat: 9.9312, lng: 76.2673, name: 'Marine Drive Road, Kochi, Kerala' },
                           { label: '📍 Rajkot NH-27', lat: 22.3039, lng: 70.8022, name: 'NH-27 Overpass, Rajkot Outer' },
                           { label: '📍 Karnal GT Road', lat: 29.6857, lng: 76.9905, name: 'GT Road Sector 4, Karnal' },
                           { label: '📍 Pune Expressway', lat: 18.5204, lng: 73.8567, name: 'Pune Expressway Outer Toll Plaza' },
@@ -507,7 +534,7 @@ const RescueCowPage = () => {
                           <label>{language === 'hi' ? 'सड़क / क्षेत्र / शहर का नाम *' : 'Road / Highway / Area Name *'}</label>
                           <input
                             className="input"
-                            placeholder="e.g. NH-48 near Milestone 14, Jaipur Road (or Mathura, Delhi, etc.)"
+                            placeholder="e.g. Kerala, Kochi, Mathura, Jaipur Road..."
                             value={form.locationName}
                             onChange={e => handleLocationNameChange(e.target.value)}
                             required

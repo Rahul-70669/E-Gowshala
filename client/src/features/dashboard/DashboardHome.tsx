@@ -399,8 +399,8 @@ const DashboardHome = () => {
                 className="btn"
                 style={{ background: 'rgba(255,255,255,0.18)', color: 'white', border: '1px solid rgba(255,255,255,0.35)', fontSize: '0.8rem', padding: '7px 14px' }}
                 onClick={() => {
-                  setSelectedRescueId(pendingRescueAlerts[0]?.id || null);
-                  setShowRescueMapModal(true);
+                  const targetId = pendingRescueAlerts[0]?.id;
+                  navigate(targetId ? `/dashboard/rescue-map?selectedId=${targetId}` : '/dashboard/rescue-map');
                 }}
               >
                 <MapPin size={14} /> {language === 'hi' ? 'रेस्क्यू मैप खोलें' : 'View on Rescue Map'}
