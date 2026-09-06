@@ -616,6 +616,7 @@ const OperationsPage = () => {
               <table className="data-table">
                 <thead>
                   <tr>
+                    <th>{language === 'hi' ? 'तारीख' : 'Date'}</th>
                     <th>{language === 'hi' ? 'कर्मचारी' : 'Staff Member'}</th>
                     {isAdmin && <th>{language === 'hi' ? 'भूमिका' : 'Role'}</th>}
                     <th>{language === 'hi' ? 'चेक-इन समय' : 'Check-In Time'}</th>
@@ -626,11 +627,11 @@ const OperationsPage = () => {
                 </thead>
                 <tbody>
                   {attendanceLoading ? (
-                    <tr><td colSpan={isAdmin ? 6 : 5} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                    <tr><td colSpan={isAdmin ? 7 : 6} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                       <RefreshCw size={20} style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }} />
                     </td></tr>
                   ) : attendanceRecords.length === 0 ? (
-                    <tr><td colSpan={isAdmin ? 6 : 5} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                    <tr><td colSpan={isAdmin ? 7 : 6} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                       {language === 'hi' ? 'इस तारीख के लिए कोई रिकॉर्ड नहीं' : 'No attendance records for this date'}
                     </td></tr>
                   ) : attendanceRecords.map((record: any, idx: number) => {
@@ -638,6 +639,12 @@ const OperationsPage = () => {
                     const staffRole = record.userId?.role || record.staffId?.role || record.role || '—';
                     const checkIn = record.checkInTime || record.createdAt;
                     const checkOut = record.checkOutTime;
+                    const recordDate = record.date || checkIn;
+                    const formattedDate = recordDate ? new Date(recordDate).toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en-IN', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric'
+                    }) : '—';
                     let duration = '—';
                     if (checkIn && checkOut) {
                       const mins = Math.round((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 60000);
@@ -647,6 +654,12 @@ const OperationsPage = () => {
                     }
                     return (
                       <tr key={record._id || idx}>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', fontSize: '0.82rem', color: 'var(--text-primary)' }}>
+                            <Calendar size={13} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+                            <span>{formattedDate}</span>
+                          </div>
+                        </td>
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '0.8rem', fontWeight: 700, flexShrink: 0 }}>
