@@ -168,3 +168,44 @@ export const getHealthStats = async (_req: Request, res: Response, next: NextFun
     res.json({ success: true, data: stats });
   } catch (error) { next(error); }
 };
+
+// ─── Emergency SOS ───────────────────────────────────────────────────────────
+
+export const triggerSosAlert = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const alert = await healthService.triggerSosAlert(req.body, {
+      id: req.user!.id,
+      name: req.user!.name,
+      role: req.user!.role,
+    });
+    res.status(201).json({ success: true, data: alert });
+  } catch (error) { next(error); }
+};
+
+export const getActiveSosAlerts = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const alerts = await healthService.getActiveSosAlerts();
+    res.json({ success: true, data: alerts });
+  } catch (error) { next(error); }
+};
+
+export const acknowledgeSosAlert = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const alert = await healthService.acknowledgeSosAlert(ps(req.params.id), {
+      id: req.user!.id,
+      name: req.user!.name,
+    });
+    res.json({ success: true, data: alert });
+  } catch (error) { next(error); }
+};
+
+export const resolveSosAlert = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const alert = await healthService.resolveSosAlert(ps(req.params.id), {
+      id: req.user!.id,
+      name: req.user!.name,
+    });
+    res.json({ success: true, data: alert });
+  } catch (error) { next(error); }
+};
+

@@ -3,6 +3,8 @@ import FormData from 'form-data';
 import HealthRecord from './healthRecord.model';
 import Vaccination from './vaccination.model';
 import Pregnancy from './pregnancy.model';
+import Cow from '../cow/cow.model';
+import Task from '../operations/task.model';
 
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
 
@@ -282,4 +284,131 @@ export const getHealthStats = async () => {
     ]);
 
   return { totalRecords, vaccinationsDue, overdueVaccinations, activePregnancies, criticalCases };
+};
+
+// ─── Emergency SOS Alerts ───────────────────────────────────────────────────
+
+export const triggerSosAlert = async (
+  data: {
+    title?: string;
+    description?: string;
+    cowId?: string;
+    shedName?: string;
+    severity?: string;
+  },
+  triggeredBy: { id: string; name: string; role: string }
+) => {
+  let cowDetails: any = null;
+  if (data.cowId) {
+    cowDetails = await Cow.findById(data.cowId).select('tagId name breed shedId status').lean();
+    if (cowDetails) {
+      await Cow.findByIdAndUpdate(data.cowId, { status: 'sick' }).catch(() => {});
+    }
+  }
+
+  const title = data.title || '🚨 VETERINARY EMERGENCY — Immediate Attention Required';
+  const cowSummary = cowDetails ? ` [Cattle: ${cowDetails.name} (${cowDetails.tagId}) - ${cowDetails.breed}]` : '';
+  const description = data.description
+    ? `${data.description}${cowSummary}`
+    : `Emergency SOS broadcast triggered from Health Module by ${triggeredBy.name} (${triggeredBy.role}). All veterinarians must report immediately for urgent clinical response.${cowSummary}`;
+
+  const task = await Task.create({
+    title,
+    description,
+    priority: 'urgent',
+    status: 'pending',
+    category: 'medical',
+    assignedBy: triggeredBy.id,
+    dueDate: new Date(),
+    notes: JSON.stringify({
+      isSos: true,
+      triggeredBy: triggeredBy.name,
+      triggeredByRole: triggeredBy.role,
+      severity: data.severity || 'critical',
+      cowId: data.cowId || null,
+      cowName: cowDetails?.name || null,
+      cowTagId: cowDetails?.tagId || null,
+      shedName: data.shedName || null,
+      createdAt: new Date().toISOString(),
+    }),
+  });
+
+  return task.populate([
+    { path: 'assignedBy', select: 'name email role' },
+  ]);
+};
+
+export const getActiveSosAlerts = async () => {
+  const query: any = {
+    priority: 'urgent',
+    status: { $in: ['pending', 'in-progress'] },
+    $or: [
+      { category: 'medical' },
+      { category: 'health' },
+      { title: { $regex: /SOS|EMERGENCY|ALERT/i } },
+    ],
+  };
+  const tasks = await Task.find(query)
+    .populate('assignedBy', 'name email role')
+    .populate('assignedTo', 'name email role')
+    .sort({ createdAt: -1 })
+    .lean();
+
+
+  return tasks.map((t: any) => {
+    let meta: any = {};
+    try {
+      meta = JSON.parse(t.notes || '{}');
+    } catch {
+      meta = { rawNotes: t.notes };
+    }
+    return {
+      id: t._id,
+      title: t.title,
+      description: t.description,
+      priority: t.priority,
+      status: t.status,
+      category: t.category,
+      assignedBy: t.assignedBy,
+      assignedTo: t.assignedTo,
+      createdAt: t.createdAt,
+      dueDate: t.dueDate,
+      ...meta,
+    };
+  });
+};
+
+export const acknowledgeSosAlert = async (id: string, user: { id: string; name: string }) => {
+  const task = await Task.findById(id);
+  if (!task) throw new Error('Emergency SOS alert not found');
+  task.status = 'in-progress';
+  task.assignedTo = user.id as any;
+
+  let meta: any = {};
+  try { meta = JSON.parse(task.notes || '{}'); } catch { meta = {}; }
+  meta.acknowledgedBy = user.name;
+  meta.acknowledgedAt = new Date().toISOString();
+  task.notes = JSON.stringify(meta);
+  await task.save();
+
+  return task.populate([
+    { path: 'assignedBy', select: 'name email role' },
+    { path: 'assignedTo', select: 'name email role' },
+  ]);
+};
+
+export const resolveSosAlert = async (id: string, user: { id: string; name: string }) => {
+  const task = await Task.findById(id);
+  if (!task) throw new Error('Emergency SOS alert not found');
+  task.status = 'completed';
+  task.completedAt = new Date();
+
+  let meta: any = {};
+  try { meta = JSON.parse(task.notes || '{}'); } catch { meta = {}; }
+  meta.resolvedBy = user.name;
+  meta.resolvedAt = new Date().toISOString();
+  task.notes = JSON.stringify(meta);
+  await task.save();
+
+  return task;
 };

@@ -141,14 +141,28 @@ const DashboardLayout = () => {
       lastAlertsFetch.current = Date.now();
       setLoadingAlerts(true);
       try {
-        const [vaccRes, cowsRes, tasksRes, invRes] = await Promise.all([
+        const [vaccRes, cowsRes, tasksRes, invRes, sosRes] = await Promise.all([
           apiClient.get('/health/vaccinations/due').catch(() => ({ data: { data: [] } })),
           apiClient.get('/cows?status=sick&limit=5').catch(() => ({ data: { data: { cows: [] } } })),
           apiClient.get('/operations/tasks').catch(() => ({ data: { data: [] } })),
           apiClient.get('/operations/inventory?lowStock=true').catch(() => ({ data: { data: [] } })),
+          apiClient.get('/health/sos/active').catch(() => ({ data: { data: [] } })),
         ]);
 
         const items: AlertItem[] = [];
+
+        // 0. Active Veterinary SOS Alerts (Top Priority)
+        const activeSos = sosRes.data?.data || [];
+        activeSos.forEach((sos: any) => {
+          items.push({
+            id: `sos-${sos.id || sos._id}`,
+            type: 'health',
+            title: `🚨 ${sos.title || 'VETERINARY EMERGENCY SOS'}`,
+            subtitle: `${sos.cowName ? `Cattle: ${sos.cowName} (${sos.cowTagId}) • ` : ''}${sos.shedName ? `Location: ${sos.shedName} • ` : ''}Reported by ${sos.triggeredBy || 'Admin'}`,
+            link: '/dashboard/health',
+            severity: 'high',
+          });
+        });
 
         // 1. Low Fodder / Inventory Alert
         const lowStockItems = invRes.data?.data || [];
@@ -162,6 +176,7 @@ const DashboardLayout = () => {
             severity: 'warning',
           });
         });
+
 
         // 2. Due/overdue vaccinations
         const dueVaccs = vaccRes.data?.data || [];
@@ -388,6 +403,35 @@ const DashboardLayout = () => {
               <span className="header-live-text">{t('nav.liveMonitoring', 'Live')}</span>
             </div>
 
+            {/* Quick SOS Trigger Button in Header for Admin / Vet */}
+            {(userRole === 'admin' || userRole === 'veterinarian') && (
+              <button
+                id="header-sos-btn"
+                type="button"
+                className="btn"
+                onClick={() => navigate('/dashboard/health?sos=true')}
+                style={{
+                  background: 'linear-gradient(135deg, #EF4444, #DC2626)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '6px 12px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 10px rgba(239,68,68,0.35)',
+                  whiteSpace: 'nowrap',
+                }}
+                title="Trigger Emergency SOS"
+              >
+                <span>🚨</span>
+                <span>SOS</span>
+              </button>
+            )}
+
             {/* Notification Bell */}
             <div className="notif-bell">
               <button
@@ -402,6 +446,7 @@ const DashboardLayout = () => {
                 <span className="notif-count">{alerts.length > 9 ? '9+' : alerts.length}</span>
               )}
             </div>
+
 
             {/* Theme Toggle */}
             <button

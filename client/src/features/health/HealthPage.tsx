@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { HeartPulse, Syringe, Plus, AlertTriangle, Baby, Calendar, Camera, Brain, CheckCircle, XCircle, Bell, ShieldCheck, Printer, FileText } from 'lucide-react';
 import apiClient from '../../lib/apiClient';
+
 import { useLanguageStore } from '../../store/languageStore';
 
 const AI_SERVICE_URL = import.meta.env.VITE_AI_SERVICE_URL || 'http://localhost:8000';
@@ -162,8 +164,10 @@ const AiScanModal = ({ cows, onClose }: { cows: any[]; onClose: () => void }) =>
 
 /* ─── Main ───────────────────────────────────────────────────────── */
 const HealthPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { language, t } = useLanguageStore();
   const [activeTab, setActiveTab]       = useState<'records' | 'vaccinations' | 'pregnancies' | 'compliance'>('records');
+
   const [records, setRecords]           = useState<any[]>([]);
   const [vaccinationsDue, setVaccDue]   = useState<any[]>([]);
   const [pregnancies, setPregnancies]   = useState<any[]>([]);
@@ -231,19 +235,71 @@ const HealthPage = () => {
 
   // ── Emergency SOS ────────────────────────────────────────────
   const [sosActive, setSosActive] = useState(false);
-  const handleSOS = async () => {
-    setSosActive(true);
-    // Create an urgent task in operations to notify all staff
+  const [activeSosAlerts, setActiveSosAlerts] = useState<any[]>([]);
+  const [showSosModal, setShowSosModal] = useState(false);
+  const [sosSubmitting, setSosSubmitting] = useState(false);
+  const [sosSuccessMsg, setSosSuccessMsg] = useState<string | null>(null);
+  const [sosForm, setSosForm] = useState({
+    cowId: '',
+    shedName: 'Main Care Barn / Shed A',
+    severity: 'critical',
+    title: '🚨 VETERINARY EMERGENCY — Immediate Attention Required',
+    description: 'Acute clinical distress observed. Animal requires immediate veterinary examination and treatment.',
+  });
+
+  const fetchActiveSos = async () => {
     try {
-      await apiClient.post('/operations/tasks', {
-        title: '🚨 VETERINARY EMERGENCY — Immediate Attention Required',
-        description: 'Emergency SOS triggered from Health module. All veterinarians must respond immediately. Check all sick cattle.',
-        priority: 'urgent',
-        status: 'pending',
-        category: 'health',
-        assignedTo: [],
-      }).catch(() => {}); // Best-effort — don't block if it fails
+      const res = await apiClient.get('/health/sos/active');
+      const alerts = res.data?.data || [];
+      setActiveSosAlerts(alerts);
+      setSosActive(alerts.length > 0);
     } catch { /* silent */ }
+  };
+
+  const handleTriggerSos = async (e?: React.FormEvent, isQuickPanic?: boolean) => {
+    if (e) e.preventDefault();
+    setSosSubmitting(true);
+    try {
+      const selectedCow = cows.find(c => c._id === sosForm.cowId);
+      const payload = isQuickPanic ? {
+        title: '🚨 RAPID VETERINARY SOS — Urgent Cattle Distress',
+        description: 'Instant 1-Tap Emergency SOS broadcast triggered from Health module. All veterinarians must report immediately.',
+        severity: 'critical',
+        shedName: 'Main Cattle Barn',
+      } : {
+        ...sosForm,
+        cowName: selectedCow?.name,
+        cowTagId: selectedCow?.tagId,
+      };
+
+      await apiClient.post('/health/sos', payload);
+      setSosSuccessMsg('🚨 Emergency SOS broadcast successfully sent to all veterinarians!');
+      setShowSosModal(false);
+      await fetchActiveSos();
+      setTimeout(() => setSosSuccessMsg(null), 5000);
+    } catch (err) {
+      console.error('Failed to trigger SOS:', err);
+    } finally {
+      setSosSubmitting(false);
+    }
+  };
+
+  const handleAcknowledgeSos = async (id: string) => {
+    try {
+      await apiClient.patch(`/health/sos/${id}/acknowledge`);
+      await fetchActiveSos();
+    } catch (err) {
+      console.error('Failed to acknowledge SOS:', err);
+    }
+  };
+
+  const handleResolveSos = async (id: string) => {
+    try {
+      await apiClient.patch(`/health/sos/${id}/resolve`);
+      await fetchActiveSos();
+    } catch (err) {
+      console.error('Failed to resolve SOS:', err);
+    }
   };
 
   useEffect(() => {
@@ -253,15 +309,32 @@ const HealthPage = () => {
       apiClient.get('/health/pregnancies/active').catch(() => ({ data: { data: [] } })),
       apiClient.get('/health/stats').catch(() => ({ data: { data: null } })),
       apiClient.get('/cows?limit=100').catch(() => ({ data: { data: { cows: [] } } })),
-    ]).then(([rec, vacc, preg, st, cowsRes]) => {
+      apiClient.get('/health/sos/active').catch(() => ({ data: { data: [] } })),
+    ]).then(([rec, vacc, preg, st, cowsRes, sosRes]) => {
       setRecords(rec.data.data.records || []);
       setVaccDue(vacc.data.data || []);
       setPregnancies(preg.data.data || []);
       setStats(st.data.data);
       setCows(cowsRes.data.data.cows || []);
+      const alerts = sosRes.data?.data || [];
+      setActiveSosAlerts(alerts);
+      setSosActive(alerts.length > 0);
       setLoading(false);
     });
+
+    const interval = setInterval(fetchActiveSos, 15000);
+    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (searchParams.get('sos') === 'true') {
+      setShowSosModal(true);
+      searchParams.delete('sos');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams]);
+
+
 
   const handleAddRecord = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -325,12 +398,32 @@ const HealthPage = () => {
           {/* 🚨 Emergency SOS */}
           <button
             id="sos-alert-btn"
+            type="button"
             className="btn"
-            style={{ background: sosActive ? 'linear-gradient(135deg,#DC2626,#991B1B)' : 'linear-gradient(135deg,#EF4444,#DC2626)', color: 'white', border: 'none', boxShadow: sosActive ? '0 0 0 4px rgba(239,68,68,0.35)' : '0 4px 16px rgba(239,68,68,0.4)', animation: sosActive ? 'notifPulse 1.5s infinite' : 'none', fontWeight: 700 }}
-            onClick={handleSOS}
+            style={{
+              background: sosActive ? 'linear-gradient(135deg,#DC2626,#991B1B)' : 'linear-gradient(135deg,#EF4444,#DC2626)',
+              color: 'white',
+              border: 'none',
+              boxShadow: sosActive ? '0 0 0 4px rgba(239,68,68,0.35)' : '0 4px 16px rgba(239,68,68,0.4)',
+              animation: sosActive ? 'notifPulse 1.5s infinite' : 'none',
+              fontWeight: 700,
+              cursor: 'pointer',
+              pointerEvents: 'auto',
+              position: 'relative',
+              zIndex: 5,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setShowSosModal(true);
+            }}
           >
-            <Bell size={16} /> {sosActive ? '🚨 SOS Active!' : '🚨 Emergency SOS'}
+            <Bell size={16} /> {sosActive ? `🚨 SOS Active (${activeSosAlerts.length})` : '🚨 Emergency SOS'}
           </button>
+
           <button className="btn btn-secondary" onClick={() => setShowAiScan(true)}>
             <Camera size={16} /> {t('health.quickAiScan', 'AI Disease Scan')}
           </button>
@@ -346,17 +439,154 @@ const HealthPage = () => {
         </div>
       </div>
 
-      {/* 🚨 Emergency SOS Banner */}
-      {sosActive && (
-        <div style={{ background: 'linear-gradient(135deg, rgba(239,68,68,0.15), rgba(220,38,38,0.08))', border: '2px solid rgba(239,68,68,0.5)', borderRadius: '14px', padding: '16px 20px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '14px', animation: 'notifPulse 2s infinite' }}>
-          <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', flexShrink: 0, fontSize: '1.4rem' }}>🚨</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 800, color: '#EF4444', fontSize: '1rem', marginBottom: '2px' }}>VETERINARY EMERGENCY ALERT ACTIVE</div>
-            <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>All veterinarians have been notified. An emergency health record has been flagged. Response required immediately.</div>
-          </div>
-          <button className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '6px 14px' }} onClick={() => setSosActive(false)}>Dismiss</button>
+      {/* 🚨 SOS Notification Toast */}
+      {sosSuccessMsg && (
+        <div style={{
+          background: 'rgba(34,197,94,0.15)',
+          border: '1px solid rgba(34,197,94,0.35)',
+          borderRadius: '12px',
+          padding: '12px 18px',
+          marginBottom: '18px',
+          color: '#86EFAC',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          fontWeight: 600,
+          boxShadow: '0 4px 16px rgba(34,197,94,0.15)',
+        }}>
+          <CheckCircle size={18} />
+          {sosSuccessMsg}
         </div>
       )}
+
+      {/* 🚨 Emergency SOS Active Banner with Live Status & Controls */}
+      {activeSosAlerts.length > 0 && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(239,68,68,0.18), rgba(185,28,28,0.12))',
+          border: '2px solid rgba(239,68,68,0.6)',
+          borderRadius: '16px',
+          padding: '18px 22px',
+          marginBottom: '22px',
+          boxShadow: '0 8px 32px rgba(239,68,68,0.2)',
+          animation: 'notifPulse 2.5s infinite',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', flexShrink: 0, fontSize: '1.4rem', boxShadow: '0 0 16px rgba(239,68,68,0.6)' }}>🚨</div>
+              <div>
+                <div style={{ fontWeight: 800, color: '#EF4444', fontSize: '1.05rem', letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>ACTIVE VETERINARY EMERGENCY SOS</span>
+                  <span style={{ fontSize: '0.72rem', background: '#EF4444', color: 'white', padding: '2px 8px', borderRadius: '12px', textTransform: 'uppercase', fontWeight: 800 }}>
+                    {activeSosAlerts.length} {activeSosAlerts.length > 1 ? 'Alerts' : 'Alert'} Active
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+                  Urgent clinical intervention requested. All veterinarians have received this priority dispatch.
+                </div>
+              </div>
+            </div>
+            <button
+              className="btn btn-secondary"
+              style={{ fontSize: '0.78rem', padding: '6px 14px', borderColor: 'rgba(239,68,68,0.4)', color: '#FCA5A5' }}
+              onClick={() => setShowSosModal(true)}
+            >
+              + Trigger New SOS
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {activeSosAlerts.map((alert: any) => (
+              <div
+                key={alert.id || alert._id}
+                style={{
+                  background: 'var(--bg-card-inner, rgba(0,0,0,0.25))',
+                  border: '1px solid rgba(239,68,68,0.3)',
+                  borderRadius: '12px',
+                  padding: '14px 18px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '14px',
+                }}
+              >
+                <div style={{ flex: 1, minWidth: '280px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '4px' }}>
+                    <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+                      {alert.title}
+                    </span>
+                    <span style={{
+                      fontSize: '0.7rem',
+                      fontWeight: 800,
+                      padding: '2px 8px',
+                      borderRadius: '8px',
+                      background: alert.status === 'in-progress' ? 'rgba(59,130,246,0.2)' : 'rgba(239,68,68,0.2)',
+                      color: alert.status === 'in-progress' ? '#60A5FA' : '#F87171',
+                      border: `1px solid ${alert.status === 'in-progress' ? 'rgba(59,130,246,0.4)' : 'rgba(239,68,68,0.4)'}`,
+                    }}>
+                      {alert.status === 'in-progress' ? '👨‍⚕️ IN PROGRESS / VET ATTENDING' : '⚠️ AWAITING VET RESPONSE'}
+                    </span>
+                  </div>
+
+                  <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '8px', lineHeight: 1.4 }}>
+                    {alert.description}
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    <span>📢 <strong>Reported By:</strong> {alert.triggeredBy || 'Admin'} ({alert.triggeredByRole || 'Admin'})</span>
+                    {alert.cowName ? (
+                      <span style={{ color: '#F87171', fontWeight: 600 }}>🐄 <strong>Cattle:</strong> {alert.cowName} (Tag: {alert.cowTagId})</span>
+                    ) : (
+                      <span style={{ color: '#F87171' }}>🐄 <strong>Cattle:</strong> General / Multiple</span>
+                    )}
+                    {alert.shedName && (
+                      <span>📍 <strong>Location:</strong> {alert.shedName}</span>
+                    )}
+                    <span>🕒 <strong>Reported:</strong> {new Date(alert.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    {alert.acknowledgedBy && (
+                      <span style={{ color: '#34D399', fontWeight: 600 }}>👨‍⚕️ <strong>Attending:</strong> {alert.acknowledgedBy}</span>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  {alert.status === 'pending' && (
+                    <button
+                      className="btn"
+                      style={{
+                        background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                        color: 'white',
+                        border: 'none',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        padding: '8px 14px',
+                      }}
+                      onClick={() => handleAcknowledgeSos(alert.id || alert._id)}
+                    >
+                      👨‍⚕️ Acknowledge (Attending)
+                    </button>
+                  )}
+                  <button
+                    className="btn"
+                    style={{
+                      background: 'linear-gradient(135deg, #10B981, #059669)',
+                      color: 'white',
+                      border: 'none',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      padding: '8px 14px',
+                    }}
+                    onClick={() => handleResolveSos(alert.id || alert._id)}
+                  >
+                    ✅ Mark Resolved
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
 
       {/* 🚨 Epidemic Clustering Outbreak Early Warning Banner */}
       <div style={{ background: 'linear-gradient(135deg, rgba(239,68,68,0.12), rgba(249,115,22,0.08))', border: '1px solid rgba(239,68,68,0.4)', borderRadius: '14px', padding: '16px 20px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
@@ -911,8 +1141,190 @@ const HealthPage = () => {
 
       {/* AI Scan Modal */}
       {showAiScan && <AiScanModal cows={cows} onClose={() => setShowAiScan(false)} />}
+
+      {/* 🚨 Emergency SOS Trigger Modal */}
+      {showSosModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(6px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+          }}
+          onClick={() => setShowSosModal(false)}
+        >
+          <div
+            className="card modal-card"
+            style={{
+              maxWidth: '560px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              padding: '24px',
+              border: '2px solid rgba(239,68,68,0.5)',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 30px rgba(239,68,68,0.25)',
+              background: 'var(--bg-card)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', borderBottom: '1px solid rgba(239,68,68,0.3)', paddingBottom: '14px' }}>
+              <h2 style={{ margin: 0, color: '#EF4444', fontSize: '1.25rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                🚨 Broadcast Veterinary Emergency SOS
+              </h2>
+              <button
+                type="button"
+                onClick={() => setShowSosModal(false)}
+                style={{ background: 'none', border: 'none', fontSize: '1.4rem', cursor: 'pointer', color: 'var(--text-muted)' }}
+              >
+                ×
+              </button>
+            </div>
+
+            <div>
+              <div style={{
+                padding: '12px 16px',
+                background: 'rgba(239,68,68,0.12)',
+                border: '1px solid rgba(239,68,68,0.3)',
+                borderRadius: '10px',
+                fontSize: '0.8125rem',
+                color: '#FCA5A5',
+                marginBottom: '18px',
+                lineHeight: 1.5,
+              }}>
+                <strong>Emergency Broadcast Warning:</strong> This alert is transmitted immediately to all attending Veterinarians and Gaushala Managers on their active dashboards and layout notification centers.
+              </div>
+
+              {/* Instant 1-Tap Panic Action */}
+              <div style={{ marginBottom: '20px', padding: '14px', borderRadius: '12px', background: 'rgba(239,68,68,0.08)', border: '1px dashed rgba(239,68,68,0.4)' }}>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#EF4444', marginBottom: '6px' }}>
+                  Need Immediate Emergency Response Right Now?
+                </div>
+                <button
+                  type="button"
+                  className="btn"
+                  style={{
+                    width: '100%',
+                    background: 'linear-gradient(135deg, #DC2626, #991B1B)',
+                    color: 'white',
+                    border: 'none',
+                    fontWeight: 800,
+                    padding: '12px',
+                    fontSize: '0.92rem',
+                    boxShadow: '0 4px 14px rgba(220,38,38,0.4)',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => handleTriggerSos(undefined, true)}
+                  disabled={sosSubmitting}
+                >
+                  {sosSubmitting ? 'Broadcasting Emergency...' : '⚡ 1-Click Instant Panic Dispatch (Broadcast Now)'}
+                </button>
+              </div>
+
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>
+                Or Customize Clinical Details:
+              </div>
+
+              <form onSubmit={handleTriggerSos}>
+                <div className="form-group" style={{ marginBottom: '14px' }}>
+                  <label style={{ display: 'block', fontWeight: 600, fontSize: '0.85rem', marginBottom: '6px', color: 'var(--text-primary)' }}>
+                    Affected Cattle (Optional / Select if specific animal in distress)
+                  </label>
+                  <select
+                    className="input"
+                    value={sosForm.cowId}
+                    onChange={(e) => setSosForm({ ...sosForm, cowId: e.target.value })}
+                  >
+                    <option value="">-- General Facility / Multiple Cattle / Outbreak --</option>
+                    {cows.map((c) => (
+                      <option key={c._id} value={c._id}>
+                        {c.tagId} — {c.name} ({c.breed})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+                  <div className="form-group">
+                    <label style={{ display: 'block', fontWeight: 600, fontSize: '0.85rem', marginBottom: '6px', color: 'var(--text-primary)' }}>
+                      Location / Barn Shed *
+                    </label>
+                    <input
+                      type="text"
+                      className="input"
+                      value={sosForm.shedName}
+                      onChange={(e) => setSosForm({ ...sosForm, shedName: e.target.value })}
+                      placeholder="e.g. Shed B / Quarantine / ICU"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label style={{ display: 'block', fontWeight: 600, fontSize: '0.85rem', marginBottom: '6px', color: 'var(--text-primary)' }}>
+                      Urgency Severity Level *
+                    </label>
+                    <select
+                      className="input"
+                      value={sosForm.severity}
+                      onChange={(e) => setSosForm({ ...sosForm, severity: e.target.value })}
+                    >
+                      <option value="critical">🚨 Critical / Acute Emergency</option>
+                      <option value="high">⚠️ High Priority / Immediate</option>
+                      <option value="moderate">🟡 Moderate Priority</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '18px' }}>
+                  <label style={{ display: 'block', fontWeight: 600, fontSize: '0.85rem', marginBottom: '6px', color: 'var(--text-primary)' }}>
+                    Emergency Symptoms & Clinical Description *
+                  </label>
+                  <textarea
+                    className="input"
+                    rows={3}
+                    value={sosForm.description}
+                    onChange={(e) => setSosForm({ ...sosForm, description: e.target.value })}
+                    placeholder="Describe symptoms (e.g., severe bloat, recumbent downer cow, acute hemorrhage, high fever >105°F)..."
+                    required
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setShowSosModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn"
+                    style={{
+                      background: 'linear-gradient(135deg, #EF4444, #B91C1C)',
+                      color: 'white',
+                      border: 'none',
+                      fontWeight: 700,
+                      boxShadow: '0 4px 16px rgba(239,68,68,0.4)',
+                      padding: '10px 20px',
+                    }}
+                    disabled={sosSubmitting}
+                  >
+                    {sosSubmitting ? 'Broadcasting...' : '🚨 Broadcast SOS Alert'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
+
 };
 
 export default HealthPage;

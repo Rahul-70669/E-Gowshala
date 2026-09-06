@@ -56,4 +56,11 @@ router.put('/pregnancies/:id', authorize('admin', 'veterinarian'), healthControl
 // ─── Stats ────────────────────────────────────────────────────────────────────
 router.get('/stats', healthController.getHealthStats);
 
+// ─── Emergency SOS ───────────────────────────────────────────────────────────
+router.post('/sos', healthController.triggerSosAlert);
+router.get('/sos/active', healthController.getActiveSosAlerts);
+router.patch('/sos/:id/acknowledge', authorize('admin', 'veterinarian'), healthController.acknowledgeSosAlert);
+router.patch('/sos/:id/resolve', authorize('admin', 'veterinarian'), healthController.resolveSosAlert);
+
 export default router;
+

@@ -3,11 +3,11 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface ITask extends Document {
   title: string;
   description: string;
-  assignedTo: mongoose.Types.ObjectId;
+  assignedTo?: mongoose.Types.ObjectId;
   assignedBy: mongoose.Types.ObjectId;
   priority: 'low' | 'medium' | 'high' | 'urgent';
   status: 'pending' | 'in-progress' | 'completed' | 'cancelled';
-  category: 'feeding' | 'cleaning' | 'medical' | 'maintenance' | 'administrative' | 'other';
+  category: 'feeding' | 'cleaning' | 'medical' | 'health' | 'maintenance' | 'administrative' | 'other';
   dueDate: Date;
   completedAt?: Date;
   notes: string;
@@ -19,7 +19,7 @@ const taskSchema = new Schema<ITask>(
   {
     title: { type: String, required: true, trim: true },
     description: { type: String, default: '' },
-    assignedTo: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    assignedTo: { type: Schema.Types.ObjectId, ref: 'User', required: false },
     assignedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     priority: {
       type: String,
@@ -33,10 +33,10 @@ const taskSchema = new Schema<ITask>(
     },
     category: {
       type: String,
-      enum: ['feeding', 'cleaning', 'medical', 'maintenance', 'administrative', 'other'],
+      enum: ['feeding', 'cleaning', 'medical', 'health', 'maintenance', 'administrative', 'other'],
       default: 'other',
     },
-    dueDate: { type: Date, required: true },
+    dueDate: { type: Date, default: () => new Date(), required: false },
     completedAt: { type: Date },
     notes: { type: String, default: '' },
   },

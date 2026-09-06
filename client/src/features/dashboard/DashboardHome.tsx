@@ -34,6 +34,7 @@ const DashboardHome = () => {
   const [financeSummary, setFinanceSummary] = useState<any>(null);
   const [loading, setLoading]             = useState(true);
   const [urgentTasks, setUrgentTasks]     = useState<any[]>([]);
+  const [activeSosAlerts, setActiveSosAlerts] = useState<any[]>([]);
   const [sosDismissed, setSosDismissed]   = useState(false);
   const [pendingRescueAlerts, setPendingRescueAlerts] = useState<any[]>([]);
   const [showRescueMapModal, setShowRescueMapModal]   = useState(false);
@@ -52,7 +53,9 @@ const DashboardHome = () => {
       apiClient.get('/operations/tasks').catch(() => ({ data: { data: [] } })),
       // Live Citizen Rescue Requests
       apiClient.get('/public/rescue-requests').catch(() => ({ data: { data: [] } })),
-    ]).then(([cowRes, healthRes, opsRes, donRes, finRes, tasksRes, rescueRes]) => {
+      // Live Emergency SOS alerts
+      apiClient.get('/health/sos/active').catch(() => ({ data: { data: [] } })),
+    ]).then(([cowRes, healthRes, opsRes, donRes, finRes, tasksRes, rescueRes, sosRes]) => {
       setCowStats(cowRes.data?.data);
       setHealthStats(healthRes.data?.data);
       setOpsStats(opsRes.data?.data);
@@ -62,9 +65,11 @@ const DashboardHome = () => {
       setUrgentTasks(allTasks.filter((t: any) => t.priority === 'urgent' && t.status !== 'completed'));
       const allRescues = rescueRes.data?.data || [];
       setPendingRescueAlerts(allRescues.filter((r: any) => r.status === 'pending'));
+      setActiveSosAlerts(sosRes.data?.data || []);
       setLoading(false);
     });
   };
+
 
   useEffect(() => {
     fetchDashboardData();
@@ -84,7 +89,26 @@ const DashboardHome = () => {
     }
   };
 
+  const handleAcknowledgeSos = async (alertId: string) => {
+    try {
+      await apiClient.patch(`/health/sos/${alertId}/acknowledge`);
+      fetchDashboardData();
+    } catch (err) {
+      console.error('Failed to acknowledge SOS:', err);
+    }
+  };
+
+  const handleResolveSos = async (alertId: string) => {
+    try {
+      await apiClient.patch(`/health/sos/${alertId}/resolve`);
+      fetchDashboardData();
+    } catch (err) {
+      console.error('Failed to resolve SOS:', err);
+    }
+  };
+
   const userRole = user?.role || 'admin';
+
 
   const { language } = useLanguageStore();
 
@@ -410,8 +434,160 @@ const DashboardHome = () => {
         </div>
       )}
 
-      {/* Issue 8: Persistent SOS Emergency Banner */}
-      {urgentTasks.length > 0 && !sosDismissed && (userRole === 'admin' || userRole === 'veterinarian' || userRole === 'caretaker') && (
+      {/* Active SOS Emergency Alert System */}
+      {activeSosAlerts.length > 0 && !sosDismissed && (
+        <div style={{
+          background: 'linear-gradient(135deg, #991B1B 0%, #7F1D1D 50%, #450A0A 100%)',
+          borderRadius: 'var(--border-radius)',
+          padding: '18px 22px',
+          marginBottom: '20px',
+          boxShadow: '0 8px 30px rgba(220,38,38,0.4)',
+          border: '1px solid rgba(248,113,113,0.5)',
+          position: 'relative',
+          animation: 'notifPulse 2.5s infinite',
+        }}>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '1.25rem', flexShrink: 0, boxShadow: '0 0 14px rgba(239,68,68,0.8)' }}>
+                🚨
+              </div>
+              <div>
+                <div style={{ color: 'white', fontWeight: 800, fontSize: '1.05rem', letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>{language === 'hi' ? 'आपातकालीन पशु चिकित्सा अलर्ट!' : 'CRITICAL VETERINARY EMERGENCY SOS'}</span>
+                  <span style={{ fontSize: '0.72rem', background: '#DC2626', color: 'white', padding: '2px 8px', borderRadius: '10px', textTransform: 'uppercase', fontWeight: 800, border: '1px solid rgba(255,255,255,0.3)' }}>
+                    {activeSosAlerts.length} {activeSosAlerts.length > 1 ? 'Alerts Active' : 'Alert Active'}
+                  </span>
+                </div>
+                <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.8rem', marginTop: '2px' }}>
+                  {language === 'hi'
+                    ? 'एडमिन पैनल से स्वास्थ्य मॉड्यूल में आपातकालीन अलर्ट भेजा गया है। पशु चिकित्सक का तत्काल पहुंचना अनिवार्य है।'
+                    : 'Emergency broadcast triggered from Health Module. Immediate on-site veterinary response required.'}
+                </div>
+              </div>
+            </div>
+            <button
+              style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
+              onClick={() => setSosDismissed(true)}
+              title="Dismiss banner"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Alert Cards */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {activeSosAlerts.map((alert: any) => (
+              <div
+                key={alert.id || alert._id}
+                style={{
+                  background: 'rgba(0,0,0,0.35)',
+                  backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  borderRadius: '12px',
+                  padding: '14px 18px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '14px',
+                }}
+              >
+                <div style={{ flex: 1, minWidth: '260px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '6px' }}>
+                    <span style={{ color: 'white', fontWeight: 700, fontSize: '0.95rem' }}>
+                      {alert.title}
+                    </span>
+                    <span style={{
+                      fontSize: '0.7rem',
+                      fontWeight: 800,
+                      padding: '2px 8px',
+                      borderRadius: '8px',
+                      background: alert.status === 'in-progress' ? 'rgba(59,130,246,0.35)' : 'rgba(239,68,68,0.35)',
+                      color: alert.status === 'in-progress' ? '#93C5FD' : '#FCA5A5',
+                      border: `1px solid ${alert.status === 'in-progress' ? 'rgba(59,130,246,0.6)' : 'rgba(239,68,68,0.6)'}`,
+                    }}>
+                      {alert.status === 'in-progress' ? '👨‍⚕️ IN PROGRESS / VET ATTENDING' : '⚠️ AWAITING VET RESPONSE'}
+                    </span>
+                  </div>
+
+                  <div style={{ color: 'rgba(255,255,255,0.92)', fontSize: '0.8125rem', marginBottom: '8px', lineHeight: 1.45 }}>
+                    {alert.description}
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', fontSize: '0.75rem', color: 'rgba(255,255,255,0.75)' }}>
+                    <span>📢 <strong>Reported By:</strong> {alert.triggeredBy || 'Admin'} ({alert.triggeredByRole || 'Admin'})</span>
+                    {alert.cowName ? (
+                      <span style={{ color: '#FCA5A5', fontWeight: 700 }}>🐄 <strong>Cattle:</strong> {alert.cowName} (Tag: {alert.cowTagId})</span>
+                    ) : (
+                      <span style={{ color: '#FCA5A5' }}>🐄 <strong>Cattle:</strong> General / Barn Facility</span>
+                    )}
+                    {alert.shedName && (
+                      <span>📍 <strong>Location:</strong> {alert.shedName}</span>
+                    )}
+                    <span>🕒 <strong>Reported:</strong> {new Date(alert.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    {alert.acknowledgedBy && (
+                      <span style={{ color: '#6EE7B7', fontWeight: 700 }}>👨‍⚕️ <strong>Attending:</strong> {alert.acknowledgedBy}</span>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  {alert.status === 'pending' && (
+                    <button
+                      className="btn"
+                      style={{
+                        background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+                        color: 'white',
+                        border: 'none',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        padding: '8px 14px',
+                        boxShadow: '0 2px 8px rgba(37,99,235,0.4)',
+                      }}
+                      onClick={() => handleAcknowledgeSos(alert.id || alert._id)}
+                    >
+                      👨‍⚕️ {language === 'hi' ? 'स्वीकार करें (मैं देख रहा हूँ)' : "Acknowledge (I'm Attending)"}
+                    </button>
+                  )}
+                  <button
+                    className="btn"
+                    style={{
+                      background: 'linear-gradient(135deg, #10B981, #059669)',
+                      color: 'white',
+                      border: 'none',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      padding: '8px 14px',
+                      boxShadow: '0 2px 8px rgba(16,185,129,0.4)',
+                    }}
+                    onClick={() => handleResolveSos(alert.id || alert._id)}
+                  >
+                    ✅ {language === 'hi' ? 'समाधान चिह्नित करें' : 'Mark Resolved'}
+                  </button>
+                  <button
+                    className="btn"
+                    style={{
+                      background: 'rgba(255,255,255,0.15)',
+                      color: 'white',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      padding: '8px 12px',
+                    }}
+                    onClick={() => navigate('/dashboard/health')}
+                  >
+                    {language === 'hi' ? 'क्लिनिकल रिकॉर्ड्स' : 'Clinical Records'} →
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Fallback Urgent Tasks Banner (if no dedicated SOS active) */}
+      {activeSosAlerts.length === 0 && urgentTasks.length > 0 && !sosDismissed && (userRole === 'admin' || userRole === 'veterinarian' || userRole === 'caretaker') && (
         <div style={{
           background: 'linear-gradient(135deg, #DC2626, #991B1B)',
           borderRadius: 'var(--border-radius)',
@@ -453,6 +629,7 @@ const DashboardHome = () => {
           </div>
         </div>
       )}
+
 
       {/* Hero Banner */}
       <div style={{ background: isDark ? 'linear-gradient(135deg, #181C26 0%, #11141B 100%)' : 'linear-gradient(135deg, #FFF7ED 0%, #FEF3C7 45%, #F0FDF4 100%)', border: isDark ? '1px solid var(--border-color)' : '1px solid rgba(234,88,12,0.22)', borderRadius: 'var(--border-radius)', marginBottom: '24px', padding: '32px', position: 'relative', overflow: 'hidden', boxShadow: isDark ? 'var(--shadow-md)' : '0 6px 24px rgba(234,88,12,0.08)' }}>
