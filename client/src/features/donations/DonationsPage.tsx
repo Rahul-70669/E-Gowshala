@@ -383,16 +383,16 @@ const DonationsPage = () => {
       )}
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '4px', marginBottom: '20px', borderBottom: '1px solid var(--border-color)', alignItems: 'center', flexWrap: 'wrap' }}>
-        <button className={`btn ${activeTab === 'all' ? 'btn-primary' : 'btn-secondary'}`} style={{ borderRadius: '8px 8px 0 0', fontSize: '0.8125rem' }}
+      <div className="tabs-responsive" style={{ gap: '4px', marginBottom: '20px', borderBottom: '1px solid var(--border-color)', alignItems: 'center' }}>
+        <button className={`btn ${activeTab === 'all' ? 'btn-primary' : 'btn-secondary'}`} style={{ borderRadius: '8px 8px 0 0', fontSize: '0.8125rem', whiteSpace: 'nowrap', flexShrink: 0 }}
           onClick={() => setActiveTab('all')}><IndianRupee size={16} /> {language === 'hi' ? 'सभी दान' : 'All Donations'}</button>
-        <button className={`btn ${activeTab === 'my' ? 'btn-primary' : 'btn-secondary'}`} style={{ borderRadius: '8px 8px 0 0', fontSize: '0.8125rem' }}
+        <button className={`btn ${activeTab === 'my' ? 'btn-primary' : 'btn-secondary'}`} style={{ borderRadius: '8px 8px 0 0', fontSize: '0.8125rem', whiteSpace: 'nowrap', flexShrink: 0 }}
           onClick={() => setActiveTab('my')}><UserCheck size={16} /> {language === 'hi' ? 'मेरे दान' : 'My Donations'} {user && `(${myDonations.length})`}</button>
-        <button className={`btn ${activeTab === 'adopt' ? 'btn-primary' : 'btn-secondary'}`} style={{ borderRadius: '8px 8px 0 0', fontSize: '0.8125rem' }}
+        <button className={`btn ${activeTab === 'adopt' ? 'btn-primary' : 'btn-secondary'}`} style={{ borderRadius: '8px 8px 0 0', fontSize: '0.8125rem', whiteSpace: 'nowrap', flexShrink: 0 }}
           onClick={() => setActiveTab('adopt')}><Heart size={16} /> {language === 'hi' ? 'गो-गोद सेवा' : 'Cow Adoptions'}</button>
-        <button className={`btn ${activeTab === 'form10bd' ? 'btn-primary' : 'btn-secondary'}`} style={{ borderRadius: '8px 8px 0 0', fontSize: '0.8125rem' }}
+        <button className={`btn ${activeTab === 'form10bd' ? 'btn-primary' : 'btn-secondary'}`} style={{ borderRadius: '8px 8px 0 0', fontSize: '0.8125rem', whiteSpace: 'nowrap', flexShrink: 0 }}
           onClick={() => setActiveTab('form10bd')}><ShieldCheck size={16} /> {language === 'hi' ? 'फॉर्म 10BD व CSR' : 'Form 10BD & CSR'}</button>
-        <a href="/adopt-wall" target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ marginLeft: 'auto', borderRadius: '8px 8px 0 0', fontSize: '0.8125rem', color: '#EC4899', borderColor: 'rgba(236,72,153,0.35)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <a href="/adopt-wall" target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ marginLeft: 'auto', borderRadius: '8px 8px 0 0', fontSize: '0.8125rem', color: '#EC4899', borderColor: 'rgba(236,72,153,0.35)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', flexShrink: 0 }}>
           <Sparkles size={14} /> 📷 {language === 'hi' ? 'पब्लिक फोटो वॉल' : 'Public Photo Wall'} ↗
         </a>
       </div>
@@ -501,7 +501,7 @@ const DonationsPage = () => {
               </button>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '18px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: '18px' }}>
               {adoptions.map((a: any) => (
                 <div key={a._id} className="card" style={{ padding: '20px', borderTop: '3px solid #F97316' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
@@ -655,7 +655,7 @@ const DonationsPage = () => {
       {showDonateForm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}
           onClick={() => setShowDonateForm(false)}>
-          <div className="card" style={{ maxWidth: '500px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
+          <div className="card modal-card" style={{ maxWidth: '500px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ marginBottom: '20px' }}>💰 {language === 'hi' ? 'दान दर्ज करें' : 'Record Donation'}</h3>
             <form onSubmit={handleDonate}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
@@ -693,7 +693,7 @@ const DonationsPage = () => {
       {showAdoptForm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}
           onClick={() => setShowAdoptForm(false)}>
-          <div className="card" style={{ maxWidth: '480px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+          <div className="card modal-card" style={{ maxWidth: '480px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '24px' }} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ marginBottom: '16px', fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)' }}>
               🐄 {language === 'hi' ? 'गो-गोद सेवा प्रायोजित करें' : 'Sponsor & Adopt a Cow'}
             </h3>

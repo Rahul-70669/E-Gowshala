@@ -21,13 +21,15 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor — handle 401
+// Response interceptor — handle 401 and 429
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       useAuthStore.getState().logout();
       window.location.href = '/login';
+    } else if (error.response?.status === 429) {
+      console.warn('⚠️ [Rate Limit] Too many requests sent to API server. Request throttled.');
     }
     return Promise.reject(error);
   }

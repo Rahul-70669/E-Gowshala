@@ -309,7 +309,7 @@ const OperationsPage = () => {
       )}
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '4px', marginBottom: '20px', borderBottom: '1px solid var(--border-color)', paddingBottom: '4px', overflowX: 'auto' }}>
+      <div className="tabs-responsive" style={{ marginBottom: '20px', borderBottom: '1px solid var(--border-color)' }}>
         {([
           ['tasks', language === 'hi' ? 'दैनिक कार्य' : 'Daily Tasks', ClipboardList],
           ['inventory', language === 'hi' ? 'भंडार' : 'Inventory & Stock', Package],
@@ -329,7 +329,7 @@ const OperationsPage = () => {
       </div>
 
       {loading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14 }}>
+        <div className="kanban-board" style={{ gap: 14 }}>
           {[1,2,3].map(i => <div key={i} className="skeleton" style={{ height: 200, borderRadius: 14 }} />)}
         </div>
       ) : activeTab === 'tasks' ? (
@@ -346,7 +346,7 @@ const OperationsPage = () => {
               ))}
             </div>
           )}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', minHeight: '400px' }}>
+          <div className="kanban-board">
             {(['pending', 'in-progress', 'completed'] as const).map((status) => (
               <div key={status} style={{ background: 'var(--bg-card-inner)', borderRadius: '14px', padding: '16px', border: '1px solid var(--border-color)' }}>
                 <h3 style={{ fontSize: '0.875rem', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -477,7 +477,7 @@ const OperationsPage = () => {
           </div>
 
           {/* Inventory Grid Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' }}>
             {inventoryItems
               .filter(item => inventoryFilter === 'all' || item.category === inventoryFilter)
               .filter(item => !inventorySearch || item.name.toLowerCase().includes(inventorySearch.toLowerCase()) || (item.nameHi && item.nameHi.includes(inventorySearch)))
@@ -695,8 +695,8 @@ const OperationsPage = () => {
 
       {/* Add Task Modal */}
       {showAddTask && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }} onClick={() => setShowAddTask(false)}>
-          <div className="card" style={{ maxWidth: '500px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }} onClick={() => setShowAddTask(false)}>
+          <div className="card modal-card" style={{ maxWidth: '500px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ marginBottom: '20px' }}>📋 {language === 'hi' ? 'नया कार्य' : 'New Task'}</h3>
             <form onSubmit={handleAddTask}>
               <div className="form-group"><label>{language === 'hi' ? 'शीर्षक' : 'Title'} *</label><input className="input" value={newTask.title} onChange={(e) => setNewTask({ ...newTask, title: e.target.value })} required /></div>
@@ -745,8 +745,8 @@ const OperationsPage = () => {
 
       {/* Restock Modal */}
       {restockItem && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }} onClick={() => setRestockItem(null)}>
-          <div className="card" style={{ maxWidth: '420px', width: '100%', padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }} onClick={() => setRestockItem(null)}>
+          <div className="card modal-card" style={{ maxWidth: '420px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ marginBottom: '12px', fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
               Restock {restockItem.name}
             </h3>
@@ -769,8 +769,8 @@ const OperationsPage = () => {
 
       {/* Add Inventory Item Modal */}
       {showAddInventory && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }} onClick={() => setShowAddInventory(false)}>
-          <div className="card" style={{ maxWidth: '500px', width: '100%', padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }} onClick={() => setShowAddInventory(false)}>
+          <div className="card modal-card" style={{ maxWidth: '500px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ marginBottom: '16px', fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)' }}>📦 Add New Inventory Item</h3>
             <form onSubmit={handleAddInventory}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
@@ -822,8 +822,8 @@ const OperationsPage = () => {
 
       {/* Add Feed Modal */}
       {showAddFeed && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }} onClick={() => setShowAddFeed(false)}>
-          <div className="card" style={{ maxWidth: '460px', width: '100%', padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }} onClick={() => setShowAddFeed(false)}>
+          <div className="card modal-card" style={{ maxWidth: '460px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ marginBottom: '16px' }}>🌿 Log Feed Distribution</h3>
             <form onSubmit={handleAddFeed}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>

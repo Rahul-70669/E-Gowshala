@@ -498,27 +498,27 @@ const DashboardHome = () => {
       </div>
 
       {/* Quick Actions */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(210px,1fr))', gap:'14px', marginBottom:'28px' }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(180px,1fr))', gap:'12px', marginBottom:'24px' }}>
         {quickActions.map((a) => (
-          <div key={a.path} className="card quick-action-card" onClick={() => navigate(a.path)} style={{ padding:'18px', cursor:'pointer', display:'flex', alignItems:'center', gap:'14px' }}>
-            <div style={{ width:'46px', height:'46px', borderRadius:'12px', background:a.gradient, display:'flex', alignItems:'center', justifyContent:'center', color:'white', flexShrink:0, boxShadow:`0 4px 14px ${a.color}45` }}>
-              {a.isCow ? <CowIcon size={24} variant="white" /> : <a.icon size={20} />}
+          <div key={a.path} className="card quick-action-card" onClick={() => navigate(a.path)} style={{ padding:'16px', cursor:'pointer', display:'flex', alignItems:'center', gap:'12px' }}>
+            <div style={{ width:'42px', height:'42px', borderRadius:'12px', background:a.gradient, display:'flex', alignItems:'center', justifyContent:'center', color:'white', flexShrink:0, boxShadow:`0 4px 14px ${a.color}45` }}>
+              {a.isCow ? <CowIcon size={22} variant="white" /> : <a.icon size={18} />}
             </div>
             <div style={{ flex:1, minWidth:0 }}>
-              <h4 style={{ fontSize:'0.9rem', fontWeight:700, color:'var(--text-primary)', marginBottom:'2px' }}>{a.label}</h4>
-              <p style={{ fontSize:'0.75rem', color:'var(--text-muted)' }}>{a.desc}</p>
+              <h4 style={{ fontSize:'0.875rem', fontWeight:700, color:'var(--text-primary)', marginBottom:'2px' }}>{a.label}</h4>
+              <p style={{ fontSize:'0.72rem', color:'var(--text-muted)' }}>{a.desc}</p>
             </div>
-            <ChevronRight size={16} style={{ color:'var(--text-muted)', flexShrink:0 }} />
+            <ChevronRight size={15} style={{ color:'var(--text-muted)', flexShrink:0 }} />
           </div>
         ))}
       </div>
 
-      {/* 4-card Overview Row — single row on desktop */}
-      <div style={{ display:'grid', gridTemplateColumns: (userRole === 'admin' || userRole === 'government') ? 'repeat(4, 1fr)' : 'repeat(2, 1fr)', gap:'16px', marginBottom:'24px' }}>
+      {/* 4-card Overview Row — responsive multi-column on desktop/tablet/mobile */}
+      <div style={{ display:'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap:'16px', marginBottom:'24px' }}>
         {OVERVIEW_CARDS.map((card) => (
           <div key={card.path} className="card" style={{ cursor:'pointer', borderTop:`3px solid ${card.color}`, paddingTop:'16px', padding:'16px' }} onClick={() => navigate(card.path)}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'14px' }}>
-              <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+              <div style={{ display:'flex', alignItems: 'center', gap:'8px' }}>
                 <div className={`icon-wrap ${card.iconColor}`} style={{ width:34, height:34, borderRadius:10 }}>
                   {card.isCow ? <CowIcon size={18} variant="transparent" /> : <card.icon size={17} />}
                 </div>
@@ -561,7 +561,7 @@ const DashboardHome = () => {
               </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '18px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '16px' }}>
               {/* Sponsored Cow 1 */}
               <div className="card" style={{ padding: '20px', borderTop: '3px solid #10B981' }}>
                 <div style={{ display: 'flex', gap: '14px', alignItems: 'center', marginBottom: '14px' }}>
@@ -639,7 +639,7 @@ const DashboardHome = () => {
           </div>
 
           {/* Section 80G Certificates & Impact Summary */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '18px' }}>
             <div className="card" style={{ padding: '22px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
                 <div className="icon-wrap blue" style={{ width: 34, height: 34, borderRadius: 10 }}>

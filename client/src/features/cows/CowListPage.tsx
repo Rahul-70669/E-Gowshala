@@ -331,7 +331,7 @@ const CowListPage = () => {
           </button>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' }}>
           {cows.map((cow) => {
             const statusConfig = STATUS_CONFIG[cow.status] || { labelEn: cow.status, labelHi: cow.status, badgeClass: 'badge-info', dotColor: '#38BDF8' };
             const statusLabel = language === 'hi' ? statusConfig.labelHi : statusConfig.labelEn;
@@ -478,11 +478,11 @@ const CowListPage = () => {
           onClick={() => setSelectedCowForQr(null)}
         >
           <div
-            className="card modal-backdrop"
+            className="card modal-backdrop modal-card"
             style={{
               maxWidth: '380px', width: '100%', textAlign: 'center',
               background: 'var(--bg-card)', border: '1px solid var(--border-color)',
-              padding: '32px 24px', borderRadius: '20px', boxShadow: 'var(--shadow-lg)',
+              padding: '24px 18px', borderRadius: '20px', boxShadow: 'var(--shadow-lg)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -533,11 +533,11 @@ const CowListPage = () => {
           onClick={() => setShowScannerModal(false)}
         >
           <div
-            className="card modal-backdrop"
+            className="card modal-backdrop modal-card"
             style={{
               maxWidth: '440px', width: '100%',
               background: 'var(--bg-card)', border: '1px solid var(--border-color)',
-              padding: '28px', borderRadius: '20px', boxShadow: 'var(--shadow-lg)',
+              padding: '24px 18px', borderRadius: '20px', boxShadow: 'var(--shadow-lg)',
             }}
             onClick={(e) => e.stopPropagation()}
           >

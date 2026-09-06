@@ -21,21 +21,25 @@ const app = express();
 // Set security HTTP headers
 app.use(helmet());
 
-// Rate limiting — 100 requests per 15 minutes per IP
+// Rate limiting — relaxed for dev and hackathon demos (3,000 requests per 15 min in prod, bypass in dev)
+const isDev = env.NODE_ENV === 'development';
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 200,
+  max: isDev ? 50000 : 3000,
   message: { success: false, message: 'Too many requests, please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => isDev || req.path === '/health' || req.path.startsWith('/public'),
 });
 app.use('/api', limiter);
 
-// Stricter rate limit for auth endpoints
+// Auth rate limiter (generous in dev, safe in prod)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: isDev ? 1000 : 100,
   message: { success: false, message: 'Too many login attempts. Try again in 15 minutes.' },
+  skip: () => isDev,
 });
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);

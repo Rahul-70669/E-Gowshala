@@ -204,7 +204,7 @@ const FinancePage = () => {
           )}
 
           {/* ── Recharts Visual Section ─────────────────────────── */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px', marginBottom: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '20px', marginBottom: '24px' }}>
             {/* Expense Category Donut / Pie */}
             <div className="card">
               <h3 style={{ fontSize: '1rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-primary)' }}>
@@ -337,7 +337,7 @@ const FinancePage = () => {
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
           onClick={() => setShowAddExpense(false)}
         >
-          <div className="card" style={{ maxWidth: '480px', width: '100%', padding: '24px', borderRadius: '16px' }} onClick={(e) => e.stopPropagation()}>
+          <div className="card modal-card" style={{ maxWidth: '480px', width: '100%', padding: '24px', borderRadius: '16px' }} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ marginBottom: '16px', fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)' }}>Record New Expense</h3>
             <form onSubmit={handleAddExpense}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>

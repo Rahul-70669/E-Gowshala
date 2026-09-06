@@ -313,11 +313,12 @@ const RescueCowPage = () => {
         position: 'sticky', top: 0, zIndex: 100,
         background: isDark ? 'rgba(15,23,42,0.92)' : 'rgba(255,255,255,0.92)',
         backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--border-color)',
-        padding: '0 24px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+        padding: '10px max(14px, env(safe-area-inset-right)) 10px max(14px, env(safe-area-inset-left))', minHeight: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        flexWrap: 'wrap', gap: '8px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.8rem' }} onClick={() => navigate('/')}>
-            <ArrowLeft size={16} /> {language === 'hi' ? 'होमपेज' : 'Back to Home'}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button className="btn btn-secondary" style={{ padding: '6px 10px', fontSize: '0.8rem' }} onClick={() => navigate('/')}>
+            <ArrowLeft size={16} /> <span className="back-btn-text">{language === 'hi' ? 'होमपेज' : 'Home'}</span>
           </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '1.4rem' }}>🚨</span>
@@ -351,7 +352,7 @@ const RescueCowPage = () => {
       </header>
 
       {/* Main Container */}
-      <div style={{ maxWidth: '960px', margin: '0 auto', padding: '32px 20px' }}>
+      <div style={{ maxWidth: '960px', margin: '0 auto', padding: '20px 14px' }}>
         {activeTab === 'report' ? (
           <div>
             {submittedReport ? (
@@ -660,7 +661,7 @@ const RescueCowPage = () => {
                 <p>All reported cattle have been safely dispatched and rehabilitated.</p>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: '16px' }}>
                 {rescueQueue.map((req: any) => {
                   const googleMapsUrl = (req.latitude && req.longitude)
                     ? `https://www.google.com/maps?q=${req.latitude},${req.longitude}`

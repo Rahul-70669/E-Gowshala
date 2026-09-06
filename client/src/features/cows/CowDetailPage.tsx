@@ -455,7 +455,7 @@ const CowDetailPage = () => {
       </div>
 
       {/* ── Navigation Tabs ────────────────────────────────── */}
-      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--border-color)', marginBottom: '20px', overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: '2px' }}>
+      <div className="tabs-responsive" style={{ borderBottom: '1px solid var(--border-color)', marginBottom: '20px' }}>
         <button
           className={`nav-link ${activeTab === 'overview' ? 'active' : ''}`}
           onClick={() => setActiveTab('overview')}
@@ -466,14 +466,14 @@ const CowDetailPage = () => {
         <button
           className={`nav-link ${activeTab === 'health' ? 'active' : ''}`}
           onClick={() => setActiveTab('health')}
-          style={{ width: 'auto', padding: '10px 20px', borderRadius: '8px 8px 0 0', fontWeight: 600 }}
+          style={{ width: 'auto', padding: '10px 20px', borderRadius: '8px 8px 0 0', fontWeight: 600, whiteSpace: 'nowrap', flexShrink: 0 }}
         >
           🩺 Health & AI History ({healthRecords.length})
         </button>
         <button
           className={`nav-link ${activeTab === 'vaccines' ? 'active' : ''}`}
           onClick={() => setActiveTab('vaccines')}
-          style={{ width: 'auto', padding: '10px 20px', borderRadius: '8px 8px 0 0', fontWeight: 600 }}
+          style={{ width: 'auto', padding: '10px 20px', borderRadius: '8px 8px 0 0', fontWeight: 600, whiteSpace: 'nowrap', flexShrink: 0 }}
         >
           💉 Vaccinations ({vaccinations.length})
         </button>
@@ -481,7 +481,7 @@ const CowDetailPage = () => {
           <button
             className={`nav-link ${activeTab === 'breeding' ? 'active' : ''}`}
             onClick={() => setActiveTab('breeding')}
-            style={{ width: 'auto', padding: '10px 20px', borderRadius: '8px 8px 0 0', fontWeight: 600 }}
+            style={{ width: 'auto', padding: '10px 20px', borderRadius: '8px 8px 0 0', fontWeight: 600, whiteSpace: 'nowrap', flexShrink: 0 }}
           >
             🐮 Breeding & Calving ({pregnancies.length})
           </button>
@@ -490,7 +490,7 @@ const CowDetailPage = () => {
 
       {/* ── Tab Content ────────────────────────────────────── */}
       {activeTab === 'overview' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '20px' }}>
           {/* Identity & Physical Info */}
           <div className="card">
             <h3 style={{ fontSize: '1rem', color: 'var(--color-primary)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -787,7 +787,7 @@ const CowDetailPage = () => {
           onClick={() => setShowQrModal(false)}
         >
           <div
-            className="card modal-backdrop"
+            className="card modal-card modal-backdrop"
             style={{
               maxWidth: '380px', width: '100%', textAlign: 'center',
               background: 'var(--bg-card)', border: '1px solid var(--border-color)',

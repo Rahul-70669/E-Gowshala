@@ -124,7 +124,7 @@ const CowRegisterPage = () => {
       {success && <div style={{ padding: '12px', borderRadius: '8px', marginBottom: '16px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)', color: '#4ADE80', fontSize: '0.85rem' }}>{success}</div>}
 
       <form onSubmit={handleSubmit}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '20px' }}>
           
           {/* Column 1: Basic Info & Photo */}
           <div className="card">

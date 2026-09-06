@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, HeartPulse, CalendarCheck,
@@ -128,9 +128,17 @@ const DashboardLayout = () => {
     setSidebarOpen(false);
   };
 
-  // Fetch real-time alerts
+  const lastAlertsFetch = useRef<number>(0);
+
+  // Fetch real-time alerts (throttled to at most once per 60 seconds or on mount/language change)
   useEffect(() => {
+    const now = Date.now();
+    if (now - lastAlertsFetch.current < 60000 && alerts.length > 0) {
+      return;
+    }
+
     const fetchAlerts = async () => {
+      lastAlertsFetch.current = Date.now();
       setLoadingAlerts(true);
       try {
         const [vaccRes, cowsRes, tasksRes, invRes] = await Promise.all([
@@ -204,6 +212,10 @@ const DashboardLayout = () => {
     };
 
     fetchAlerts();
+
+    // Auto refresh alerts every 90 seconds
+    const interval = setInterval(fetchAlerts, 90000);
+    return () => clearInterval(interval);
   }, [location.pathname, language]);
 
   return (
@@ -347,8 +359,8 @@ const DashboardLayout = () => {
               <Menu size={22} />
             </button>
             {/* Breadcrumb */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', minWidth: 0 }}>
+              <div className="header-breadcrumb-path" style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>
                 <Home size={11} />
                 <span>E-Gowshala</span>
                 <BreadcrumbArrow size={10} />
@@ -356,7 +368,7 @@ const DashboardLayout = () => {
                   {t(allNavItems.find((i) => i.path === location.pathname || (i.path !== '/dashboard' && location.pathname.startsWith(i.path)))?.key || 'nav.dashboard')}
                 </span>
               </div>
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', lineHeight: 1 }}>
+              <h2 className="header-title-text" style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', lineHeight: 1.1 }}>
                 {t(allNavItems.find((i) => i.path === location.pathname || (i.path !== '/dashboard' && location.pathname.startsWith(i.path)))?.key || 'nav.dashboard')}
               </h2>
             </div>
@@ -364,16 +376,16 @@ const DashboardLayout = () => {
 
           <div className="header-right">
             {/* Live Beacon */}
-            <div style={{
+            <div className="header-live-badge" style={{
               display: 'flex', alignItems: 'center', gap: '6px',
               fontSize: '0.72rem', fontWeight: 700, color: '#059669',
-              padding: '6px 11px', borderRadius: '9999px',
+              padding: '6px 10px', borderRadius: '9999px',
               background: 'rgba(5, 150, 105, 0.10)',
               border: '1px solid rgba(5, 150, 105, 0.22)',
-              whiteSpace: 'nowrap',
+              whiteSpace: 'nowrap', flexShrink: 0,
             }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10B981', display: 'inline-block', animation: 'pulse 2s infinite', flexShrink: 0 }} />
-              {t('nav.liveMonitoring', 'Live')}
+              <span className="header-live-text">{t('nav.liveMonitoring', 'Live')}</span>
             </div>
 
             {/* Notification Bell */}
@@ -381,10 +393,10 @@ const DashboardLayout = () => {
               <button
                 className="btn btn-secondary"
                 onClick={() => setNotifOpen(true)}
-                style={{ padding: '8px 12px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ padding: '7px 10px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 title={t('nav.alerts', 'Alerts')}
               >
-                <Bell size={17} style={{ color: alerts.length > 0 ? '#F97316' : 'var(--text-secondary)' }} />
+                <Bell size={16} style={{ color: alerts.length > 0 ? '#F97316' : 'var(--text-secondary)' }} />
               </button>
               {alerts.length > 0 && (
                 <span className="notif-count">{alerts.length > 9 ? '9+' : alerts.length}</span>
@@ -395,12 +407,12 @@ const DashboardLayout = () => {
             <button
               className="btn btn-secondary"
               onClick={toggleTheme}
-              style={{ padding: '8px 12px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              style={{ padding: '7px 10px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
               {theme === 'dark'
-                ? <Sun size={17} style={{ color: '#FBBF24' }} />
-                : <Moon size={17} style={{ color: '#6366F1' }} />}
+                ? <Sun size={16} style={{ color: '#FBBF24' }} />
+                : <Moon size={16} style={{ color: '#6366F1' }} />}
             </button>
 
             {/* Language Toggle */}
@@ -408,14 +420,14 @@ const DashboardLayout = () => {
               className="btn btn-secondary"
               onClick={toggleLanguage}
               style={{
-                padding: '7px 13px', borderRadius: '10px', fontSize: '0.8rem',
-                display: 'flex', alignItems: 'center', gap: '5px',
+                padding: '6px 10px', borderRadius: '10px', fontSize: '0.78rem',
+                display: 'flex', alignItems: 'center', gap: '4px',
                 border: language === 'hi' ? '1px solid rgba(249,115,22,0.45)' : undefined,
                 background: language === 'hi' ? 'rgba(249,115,22,0.10)' : undefined,
               }}
               title="Switch Language / भाषा बदलें"
             >
-              <Globe size={14} style={{ color: 'var(--color-primary)' }} />
+              <Globe size={13} style={{ color: 'var(--color-primary)' }} />
               <span style={{ fontWeight: 700, color: language === 'hi' ? 'var(--color-primary)' : 'var(--text-primary)' }}>
                 {language === 'en' ? 'EN' : 'HI'}
               </span>
@@ -435,9 +447,9 @@ const DashboardLayout = () => {
             {/* User Avatar Pill */}
             <div style={{
               display: 'flex', alignItems: 'center', gap: '8px',
-              padding: '5px 12px 5px 5px', borderRadius: '9999px',
+              padding: '4px 10px 4px 4px', borderRadius: '9999px',
               background: 'var(--bg-card-inner)', border: '1px solid var(--border-color)',
-              cursor: 'pointer',
+              cursor: 'pointer', flexShrink: 0,
             }}
               onClick={handleLogout}
               title="Logout"
@@ -450,10 +462,10 @@ const DashboardLayout = () => {
               }}>
                 {user?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
-              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
+              <span className="header-user-info" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
                 {user?.name?.split(' ')[0] || 'User'}
               </span>
-              <LogOut size={13} style={{ color: 'var(--text-muted)' }} />
+              <LogOut size={13} className="header-user-info" style={{ color: 'var(--text-muted)' }} />
             </div>
           </div>
         </header>

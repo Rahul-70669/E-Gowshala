@@ -420,10 +420,10 @@ const HealthPage = () => {
       )}
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '4px', marginBottom: '20px', borderBottom: '1px solid var(--border-color)', paddingBottom: '4px' }}>
+      <div className="tabs-responsive" style={{ marginBottom: '20px', borderBottom: '1px solid var(--border-color)' }}>
         {TABS.map((tab) => (
           <button key={tab.key} className={`btn ${activeTab === tab.key ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ borderRadius: '8px 8px 0 0', fontSize: '0.8125rem' }}
+            style={{ borderRadius: '8px 8px 0 0', fontSize: '0.8125rem', whiteSpace: 'nowrap' }}
             onClick={() => setActiveTab(tab.key)}>
             <tab.icon size={16} /> {tab.label}
           </button>
@@ -593,7 +593,7 @@ const HealthPage = () => {
           </div>
 
           {/* Compliance Metrics Grid with SVG Circular Progress Rings */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
             
             {/* Card 1: FMD Bi-Annual Vaccine */}
             <div className="card" style={{ padding: '20px', borderTop: '3px solid #10B981', background: 'var(--bg-card)' }}>
@@ -777,9 +777,9 @@ const HealthPage = () => {
 
       {/* Add Record Modal */}
       {showAddRecord && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
           onClick={() => setShowRecord(false)}>
-          <div className="card" style={{ maxWidth: '520px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
+          <div className="card modal-card" style={{ maxWidth: '520px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ marginBottom: '20px' }}>🩺 New Health Record</h3>
             <form onSubmit={handleAddRecord}>
               <div className="form-group">
@@ -821,9 +821,9 @@ const HealthPage = () => {
 
       {/* Add Pregnancy Modal */}
       {showAddPregnancy && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
           onClick={() => setShowAddPregnancy(false)}>
-          <div className="card" style={{ maxWidth: '500px', width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+          <div className="card modal-card" style={{ maxWidth: '500px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ marginBottom: '16px', fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)' }}>
               🍼 Record Insemination / Pregnancy
             </h3>

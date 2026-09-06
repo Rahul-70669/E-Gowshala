@@ -100,33 +100,33 @@ export const DonatePage = () => {
         background: isDark ? 'rgba(11, 13, 18, 0.92)' : 'rgba(255, 255, 255, 0.92)',
         backdropFilter: 'blur(16px)',
         borderBottom: '1px solid var(--border-color)',
-        padding: '12px 24px',
+        padding: '10px max(14px, env(safe-area-inset-right)) 10px max(14px, env(safe-area-inset-left))',
       }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
           {/* Left: Back Button + Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <button
               onClick={() => navigate('/')}
               className="btn btn-secondary"
               style={{
-                display: 'flex', alignItems: 'center', gap: '8px',
-                padding: '8px 14px', borderRadius: '10px', fontWeight: 700, fontSize: '0.85rem',
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '7px 10px', borderRadius: '10px', fontWeight: 700, fontSize: '0.82rem',
                 border: '1px solid var(--border-color)',
               }}
               title="Return to Public Homepage"
             >
               <ArrowLeft size={16} />
-              <span>{language === 'hi' ? 'मुख्य पृष्ठ' : 'Home'}</span>
+              <span className="back-btn-text">{language === 'hi' ? 'मुख्य पृष्ठ' : 'Home'}</span>
             </button>
 
-            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
               <div style={{
-                width: '36px', height: '36px', borderRadius: '10px',
+                width: '34px', height: '34px', borderRadius: '10px',
                 background: 'linear-gradient(135deg, #10B981, #059669)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                padding: '3px',
+                padding: '3px', flexShrink: 0,
               }}>
-                <CowIcon size={22} variant="white" />
+                <CowIcon size={20} variant="white" />
               </div>
               <div className="hidden sm:block">
                 <span style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--text-primary)' }}>E-Gowshala</span>
@@ -138,7 +138,7 @@ export const DonatePage = () => {
           </div>
 
           {/* Right: Quick Links, Theme, Lang, CTA */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
             <Link to="/impact" className="btn btn-secondary hidden md:inline-flex" style={{ padding: '6px 12px', fontSize: '0.8rem', color: '#10B981', borderColor: 'rgba(16,185,129,0.3)' }}>
               📊 Live Impact
             </Link>
@@ -150,19 +150,19 @@ export const DonatePage = () => {
             <button
               className="btn btn-secondary"
               onClick={toggleTheme}
-              style={{ padding: '8px 10px', borderRadius: '10px', border: '1px solid var(--border-color)' }}
+              style={{ padding: '7px 9px', borderRadius: '10px', border: '1px solid var(--border-color)' }}
               title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
             >
-              {isDark ? <Sun size={16} style={{ color: '#FBBF24' }} /> : <Moon size={16} style={{ color: '#6366F1' }} />}
+              {isDark ? <Sun size={15} style={{ color: '#FBBF24' }} /> : <Moon size={15} style={{ color: '#6366F1' }} />}
             </button>
 
             {/* Language Toggle */}
             <button
               className="btn btn-secondary"
               onClick={toggleLanguage}
-              style={{ padding: '8px 10px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 700, border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '4px' }}
+              style={{ padding: '7px 9px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 700, border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '4px' }}
             >
-              <Globe size={14} /> {language === 'hi' ? 'EN' : 'हिन्दी'}
+              <Globe size={13} /> {language === 'hi' ? 'EN' : 'HI'}
             </button>
 
             {/* Dashboard / Sign In */}
@@ -170,19 +170,21 @@ export const DonatePage = () => {
               <button
                 className="btn btn-primary"
                 onClick={() => navigate('/dashboard')}
-                style={{ padding: '8px 14px', fontSize: '0.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}
+                style={{ padding: '7px 12px', fontSize: '0.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}
+                title="Dashboard"
               >
                 <LayoutDashboard size={15} />
-                <span>Dashboard</span>
+                <span className="hidden sm:inline">Dashboard</span>
               </button>
             ) : (
               <button
                 className="btn btn-primary"
                 onClick={() => navigate('/login')}
-                style={{ padding: '8px 14px', fontSize: '0.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}
+                style={{ padding: '7px 12px', fontSize: '0.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}
+                title="Sign In"
               >
                 <LogIn size={15} />
-                <span>Sign In</span>
+                <span className="hidden sm:inline">Sign In</span>
               </button>
             )}
           </div>
@@ -190,7 +192,7 @@ export const DonatePage = () => {
       </header>
 
       {/* ── Main Container ───────────────────────────────────── */}
-      <div style={{ maxWidth: 1140, margin: '0 auto', padding: '48px 24px 60px', width: '100%' }}>
+      <div style={{ maxWidth: 1140, margin: '0 auto', padding: '28px 16px 40px', width: '100%' }}>
         {/* Hero */}
         <div style={{ textAlign: 'center', marginBottom: 44 }}>
           <div style={{
@@ -236,9 +238,9 @@ export const DonatePage = () => {
         </div>
 
         {/* Form and Right Sidebar Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 28, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: 28, alignItems: 'start' }}>
           {/* ── Left: Donation Form Card ── */}
-          <div className="card" style={{ padding: 32 }}>
+          <div className="card" style={{ padding: '24px 18px' }}>
             {step === 'amount' && (
               <>
                 <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 6px' }}>
@@ -265,7 +267,7 @@ export const DonatePage = () => {
                 </div>
 
                 {/* Preset Amounts */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(95px, 1fr))', gap: 10, marginBottom: 16 }}>
                   {PRESET_AMOUNTS.map(amt => {
                     const isSelected = selectedAmount === amt;
                     return (

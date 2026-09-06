@@ -3,7 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import {
   Heart, ShieldCheck, Sparkles, ArrowRight, Activity, MapPin,
   Calendar, CheckCircle, Download, FileText, Sun, Moon,
-  Globe, LogIn, LayoutDashboard, Share2, Compass, Award, ExternalLink
+  Globe, LogIn, LayoutDashboard, Share2, Compass, Award, ExternalLink,
+  Menu, X, Ambulance
 } from 'lucide-react';
 import { CowIcon } from '../../components/common/CowIcon';
 import { useThemeStore } from '../../store/themeStore';
@@ -23,6 +24,7 @@ export const PublicHomePage = () => {
   const [impactStats, setImpactStats] = useState<any>(null);
   const [featuredCows, setFeaturedCows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     // Fetch live public aggregates
@@ -44,16 +46,15 @@ export const PublicHomePage = () => {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column' }}>
       {/* ── Top Navigation Bar ───────────────────────────────── */}
-      <header style={{
-        position: 'sticky', top: 0, zIndex: 50,
-        background: isDark ? 'rgba(11, 13, 18, 0.92)' : 'rgba(255, 255, 255, 0.92)',
-        backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid var(--border-color)',
-        padding: '14px 24px',
-      }}>
-        <div style={{ maxWidth: '1240px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
+      <header
+        className="landing-header"
+        style={{
+          background: isDark ? 'rgba(11, 13, 18, 0.94)' : 'rgba(255, 255, 255, 0.94)',
+        }}
+      >
+        <div className="landing-header-inner">
           {/* Logo Brand */}
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none' }}>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', flexShrink: 0 }}>
             <div style={{
               width: '42px', height: '42px', borderRadius: '12px',
               background: 'linear-gradient(135deg, #F97316 0%, #EA580C 50%, #7C3AED 100%)',
@@ -65,84 +66,159 @@ export const PublicHomePage = () => {
               <CowIcon size={28} variant="white" />
             </div>
             <div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1 }} className="gradient-text">
+              <div style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.15 }} className="gradient-text">
                 E-Gowshala
               </div>
-              <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.04em' }}>
+              <div className="landing-logo-subtitle" style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
                 {language === 'hi' ? 'स्मार्ट गौशाला प्रबंधन एवं गौसेवा' : 'SMART LIVESTOCK AI & GAUSEVA'}
               </div>
             </div>
           </Link>
 
-          {/* Center Navigation Links */}
-          <nav style={{ display: 'flex', alignItems: 'center', gap: '22px' }} className="hidden md:flex">
-            <a href="#impact" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600 }}>
-              {language === 'hi' ? 'सामाजिक प्रभाव' : 'Live Impact'}
+          {/* Center Navigation Links (Desktop) */}
+          <nav className="landing-nav-menu">
+            <a href="#impact" className="landing-nav-item">
+              <Activity size={15} style={{ color: '#0EA5E9' }} />
+              <span>{language === 'hi' ? 'सामाजिक प्रभाव' : 'Live Impact'}</span>
             </a>
-            <Link to="/adopt-wall" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Sparkles size={14} style={{ color: '#EC4899' }} />
-              {language === 'hi' ? 'गौ गोद दीवार' : 'Adopt a Cow'}
+            <Link to="/adopt-wall" className="landing-nav-item">
+              <Sparkles size={15} style={{ color: '#EC4899' }} />
+              <span>{language === 'hi' ? 'गौ गोद दीवार' : 'Adopt a Cow'}</span>
             </Link>
-            <Link to="/rescue" style={{ color: '#EF4444', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Link to="/rescue" className="landing-nav-item rescue">
               <span>🚨</span>
-              {language === 'hi' ? 'गाय रेस्क्यू करें' : 'Rescue Cow'}
+              <span>{language === 'hi' ? 'गाय रेस्क्यू करें' : 'Rescue Cow'}</span>
             </Link>
-            <a href="#rescue-map" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600 }}>
-              {language === 'hi' ? 'रेस्क्यू मैप' : 'Rescue Map'}
+            <a href="#rescue-map" className="landing-nav-item">
+              <MapPin size={15} style={{ color: '#F97316' }} />
+              <span>{language === 'hi' ? 'रेस्क्यू मैप' : 'Rescue Map'}</span>
             </a>
-            <a href="#technology" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600 }}>
-              {language === 'hi' ? 'एआई तकनीक' : 'AI Technology'}
+            <a href="#technology" className="landing-nav-item">
+              <Sparkles size={15} style={{ color: '#8B5CF6' }} />
+              <span>{language === 'hi' ? 'एआई तकनीक' : 'AI Technology'}</span>
             </a>
-            <Link to="/donate" style={{ color: '#10B981', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Heart size={14} />
-              {language === 'hi' ? 'दान (80G कर छूट)' : 'Donate (80G)'}
+            <Link to="/donate" className="landing-nav-item donate">
+              <Heart size={15} />
+              <span>{language === 'hi' ? 'दान (80G कर छूट)' : 'Donate (80G)'}</span>
             </Link>
           </nav>
 
           {/* Right Action Controls */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             {/* Theme Toggle */}
             <button
-              className="btn btn-secondary"
+              className="landing-action-btn btn-secondary"
               onClick={toggleTheme}
-              style={{ padding: '8px 10px', borderRadius: '10px', border: '1px solid var(--border-color)' }}
+              style={{ width: '40px', padding: 0 }}
               title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
             >
-              {isDark ? <Sun size={16} style={{ color: '#FBBF24' }} /> : <Moon size={16} style={{ color: '#6366F1' }} />}
+              {isDark ? <Sun size={17} style={{ color: '#FBBF24' }} /> : <Moon size={17} style={{ color: '#6366F1' }} />}
             </button>
 
             {/* Language Toggle */}
             <button
-              className="btn btn-secondary"
+              className="landing-action-btn btn-secondary"
               onClick={toggleLanguage}
-              style={{ padding: '8px 10px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 700, border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '4px' }}
+              style={{ padding: '0 10px', fontSize: '0.8125rem', gap: '4px' }}
+              title="Toggle Language"
             >
-              <Globe size={14} /> {language === 'hi' ? 'EN' : 'हिन्दी'}
+              <Globe size={14} />
+              <span>{language === 'hi' ? 'EN' : 'HI'}</span>
             </button>
 
             {/* Dashboard / Sign-In Button */}
             {isAuthenticated ? (
               <button
-                className="btn btn-primary"
+                className="landing-action-btn btn-primary landing-auth-btn"
                 onClick={() => navigate('/dashboard')}
-                style={{ padding: '8px 16px', fontSize: '0.875rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}
+                style={{ padding: '0 14px', gap: '6px' }}
+                title="Go to Dashboard"
               >
                 <LayoutDashboard size={16} />
-                <span>{language === 'hi' ? 'डैशबोर्ड खोलें' : 'Go to Dashboard'}</span>
+                <span className="landing-auth-text">{language === 'hi' ? 'डैशबोर्ड' : 'Dashboard'}</span>
               </button>
             ) : (
               <button
-                className="btn btn-primary"
+                className="landing-action-btn btn-primary landing-auth-btn"
                 onClick={() => navigate('/login')}
-                style={{ padding: '8px 16px', fontSize: '0.875rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}
+                style={{ padding: '0 14px', gap: '6px' }}
+                title="Sign In"
               >
                 <LogIn size={16} />
-                <span>{language === 'hi' ? 'लॉगिन' : 'Sign In'}</span>
+                <span className="landing-auth-text">{language === 'hi' ? 'लॉगिन' : 'Sign In'}</span>
               </button>
             )}
+
+            {/* Mobile Menu Toggle Button */}
+            <button
+              className="landing-action-btn btn-secondary landing-mobile-menu-btn"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              style={{ width: '40px', padding: 0 }}
+              aria-label="Toggle Navigation Menu"
+            >
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
         </div>
       </header>
+
+      {/* Mobile Navigation Drawer */}
+      <div className={`landing-mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
+        <a
+          href="#impact"
+          className="landing-nav-item"
+          style={{ width: '100%', padding: '10px 14px' }}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <Activity size={16} style={{ color: '#0EA5E9' }} />
+          <span>{language === 'hi' ? 'सामाजिक प्रभाव' : 'Live Impact'}</span>
+        </a>
+        <Link
+          to="/adopt-wall"
+          className="landing-nav-item"
+          style={{ width: '100%', padding: '10px 14px' }}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <Sparkles size={16} style={{ color: '#EC4899' }} />
+          <span>{language === 'hi' ? 'गौ गोद दीवार' : 'Adopt a Cow'}</span>
+        </Link>
+        <Link
+          to="/rescue"
+          className="landing-nav-item rescue"
+          style={{ width: '100%', padding: '10px 14px' }}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <span>🚨</span>
+          <span>{language === 'hi' ? 'गाय रेस्क्यू करें' : 'Rescue Cow'}</span>
+        </Link>
+        <a
+          href="#rescue-map"
+          className="landing-nav-item"
+          style={{ width: '100%', padding: '10px 14px' }}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <MapPin size={16} style={{ color: '#F97316' }} />
+          <span>{language === 'hi' ? 'रेस्क्यू मैप' : 'Rescue Map'}</span>
+        </a>
+        <a
+          href="#technology"
+          className="landing-nav-item"
+          style={{ width: '100%', padding: '10px 14px' }}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <Sparkles size={16} style={{ color: '#8B5CF6' }} />
+          <span>{language === 'hi' ? 'एआई तकनीक' : 'AI Technology'}</span>
+        </a>
+        <Link
+          to="/donate"
+          className="landing-nav-item donate"
+          style={{ width: '100%', padding: '10px 14px' }}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <Heart size={16} />
+          <span>{language === 'hi' ? 'दान (80G कर छूट)' : 'Donate (80G)'}</span>
+        </Link>
+      </div>
 
       {/* ── Hero Section ─────────────────────────────────────── */}
       <section style={{

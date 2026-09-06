@@ -144,7 +144,7 @@ const VisitorsPage = () => {
       {/* Add Visitor Modal */}
       {showAddForm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }} onClick={() => setShowAddForm(false)}>
-          <div className="card" style={{ maxWidth: '500px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
+          <div className="card modal-card" style={{ maxWidth: '500px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
           <h3 style={{ marginBottom: '20px', fontWeight: 800, color: 'var(--text-primary)', padding: '0 4px' }}>Schedule Visit</h3>
             <form onSubmit={handleAdd}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
